@@ -6,10 +6,12 @@ correlated materials (SCM) using beyond-DFT methods such as DFT+U, DFT+Hybrids a
 
 <br />
 Structure of the framework
+<br/>
 ![](web/summary.png)
 <br />
 <br />
 Workflow
+<br/>
 ![](web/steps.png)
 <br />
 
