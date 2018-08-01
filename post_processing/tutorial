@@ -1,0 +1,17 @@
+-------------------------------------------------
+Computing Bands and DOS using DMFT self energies
+-------------------------------------------------
+
+
+In this directory, you have src_files, ancont, bands, dos subdirectories.
+
+src_files have the fortran source files to perform DMFT ksum or Green function calculation.
+
+You can compile this and obtain dmft_ksum_dos, dmft_ksum_band
+
+And then you need to analytically continue your self-energy (Sig.out.XXX) on the imaginary axis obtained using CTQMC  to the real axis.
+This information is on ancont folder.
+
+You can read the README file in the example folder. (Let me know if this doesn't work)
+
+Once you get the real frequency self energy files, you can now compute band structure and dos.

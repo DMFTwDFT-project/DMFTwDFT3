@@ -1,0 +1,28 @@
+###### Computing Bands ##########
+
+1) First, copy the following files to the BAND directory.
+wannier90.chk, 
+wannier90.eig, 
+INPUT.py, 
+ksum.input
+POSCAR, 
+DMFT_mu.out, 
+SigMdc.out, 
+(SigMdc_dn.out), 
+dmft_ksum_band
+
+2) Copy the obtained Sig.out on the real axis to the current directory as SigX.out 
+
+Ex) cp ../ancont/Sig.out ./Sig1.out
+
+
+3) Run ./Interp_Sig.py to generate SigMoo_real.out file in a more dense mesh. (emin, emax, rom (number of ompoints) can be changed)
+
+4) Now one can generate the k-path to compute the band structure. Use kgen.py file to change k-path and nk_band and to generate klist.dat.
+
+5) Now copy ksum.input file to the current directory and run dmft_ksum_band. The first line of ksum.input is the number of k-points(same as nk_bands in kgen.py), and the second line is the number of omega points. (This number should be same as the number in SigMoo_real.out, also determined in Interp_Sig.py (paramater rom)).
+
+Ex) mpirun -n 16 ./dmft_ksum_band
+
+6) Now you should see Gk.out file. Run plot_Gk.py to generate A_k.eps file.
+

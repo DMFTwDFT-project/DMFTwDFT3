@@ -1,0 +1,23 @@
+###### Analytic continuation of self-energy #########
+
+1) First, you can make ancont directory, and copy Cmp_Siginp.py, maxent_params.dat, maxentropy.py, maxent_run.py, saverage.py, and you can copy a few last runs of self energies (Sig.out.XX) from the DMFT impurity solver.
+
+Ex) cp ../imp.0/Sig.out.0.2[6-9] .
+
+2) Average the self energies.
+
+Ex) ./saverage.py Sig.out.0.2* -o sig.inpx
+
+3) Copy the first line (#...) of one of Sig.out.XX to the first line of sig.inpx
+
+4) Run Cmp_Siginp.py to generate sig.inp (Sigma(w)-Sigma(oo)) and Sigoo.out files.
+
+Ex) ./Cmp_Siginp.py sig.inpx
+
+5) Run maxent_run.py to execute the analytic continuation. You can change options from maxent_params.dat
+
+Ex) ./maxent_run.py sig.inp 
+
+6) You can check the self-energy (Sigma(w)-Sigma(oo)) on the real axis in Sig.out file.
+
+ 

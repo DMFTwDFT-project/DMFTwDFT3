@@ -1,0 +1,15 @@
+ISPIN=    1 	#ISPIN
+LMAXMIX=    4 	#LMAX
+NBANDS=    60 	# LMAX
+ISYM=    0 	#Symmetrisation
+System=    LaNiO3 	# The name of system
+GGA=    PS 	#GGA
+IALGO=    48 	#LMAX
+LWANNIER90=    .TRUE. 	# ISMEAR
+NPAR=    1 	#NPAR
+ISMEAR=    -4 	# ISMEAR
+NELM=    20 	#LMAX
+ADDGRID=    .TRUE. 	#GGA
+ENCUT=    600.0 	# Energy cutoff
+LDMFT= .TRUE.
+NELM= 20

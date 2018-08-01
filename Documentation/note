@@ -1,0 +1,15 @@
+
+ksum is the module for achieving DMFT self-consistency.
+
+
+More detail is written in the following paper (Appendix B)
+
+https://journals.aps.org/prb/pdf/10.1103/PhysRevB.90.235103
+
+So it performs the k-point sum and compute local Green's function and hybridization function Delta.inp
+
+atomd is the module to compute local atomic interactions used for ctqmc run.
+
+This part is actually written by Kristjan Haule (Rutgers) and so ctqmc code is written by him.
+
+So atomd.py will generate input files for ctqmc run.
