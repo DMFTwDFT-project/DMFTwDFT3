@@ -1,8 +1,0 @@
-digraph Test{
-	root -> bin;
-	root -> ctqmc;
-	root -> fortran;
-	fortran -> ksum;
-	fortran -> atomd;
-	root -> example;
-}
