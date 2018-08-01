@@ -29,6 +29,7 @@ Uthpala Herath <br />
 Support packages
 ----------------
 [PyProcar](https://github.com/uthpalah/PyProcar)
+<br />
 [PyChemia](https://github.com/MaterialsDiscovery/PyChemia)
 
 
@@ -39,7 +40,7 @@ Coming soon...
 
 Changes
 -------
-v1.0, July 31, 2018 - Initial release (Command line version)
+v1.0 July 31, 2018 - Initial release (Command line version)
 
 
 
