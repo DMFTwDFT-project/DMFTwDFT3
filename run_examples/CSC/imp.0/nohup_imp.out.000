@@ -1,0 +1,102 @@
+Hello World! I am 0 of 72
+Input parameters are:
+fDelta=Delta.inp
+fcix=actqmc.cix
+mu=34.9596
+beta=30
+U=5
+M=5000000
+Ntau=250
+Nmax=50
+nom=30
+nomD=0
+nomv=0
+nomb=100
+nOm=0
+PChangeOrder=0.9
+PMove=0.3
+PlocalMoves=0
+tsample=200
+tsampleFast=10
+warmup=250000
+CleanUpdate=100000000
+minF=1e-10
+minM=1e-15
+minD=0
+Ncout=500000
+Naver=80000000
+Gf=Gf.out
+Sig=Sig.out
+TwoKinks=0
+GlobalFlip=1000000
+treshold=1e-10
+SampleGtau=-1
+ReduceComm=0
+Ncorrect=-1
+aom=1
+som=3
+PreciseP=1
+sderiv=0.01
+minDeltat=1e-07
+SampleSusc=0
+SampleVertex=-1
+maxNoise=1e+100
+AllRead=0
+LazyTrace=1
+fastFilesystem=0
+SampleTransitionP=0
+SaveStatus=1
+Segment=1
+mode=SM
+sampling with projection to SVD functions is turned on
+svd_lmax=30
+svd_L=10
+svd_x0=0.005
+svd_Nw=500
+svd_Ntau=250
+iseed=0 in rank 0
+setup time=0
+svd time=0.04
+last singular value=6.14231e-08
+Old status retrieved with sign=1 and determinants 0:1.21833e+12 1:1 2:1 3:6.49442e+06 4:-0.0128227 5:1.6735e+11 6:1 7:1 8:3.33821e+17 9:1 
+common::Segment=1
+Nmax resized from 222 to 286
+Nmax resized from 286 to 363
+Global flip succeeded: P=1 ratioD=1 ms=1
+  1000000 0     nf=8.006     <Sz>=-0.01295   <s>=1          chiS0=1.084         chiD=0.04842        Epot=125.1       Ekin=-4.166     2.025    5.981    
+  1500000 0     nf=8.01      <Sz>=-0.004146   <s>=1          chiS0=1.541         chiD=0.04813        Epot=125.2       Ekin=-4.131     2.03     5.981    
+Global flip succeeded: P=1 ratioD=1 ms=1
+  2000000 0     nf=8.01      <Sz>=0.02481    <s>=1          chiS0=1.527         chiD=0.04592        Epot=125.2       Ekin=-4.135     2.03     5.98     
+  2500000 0     nf=8.01      <Sz>=0.04487    <s>=1          chiS0=1.644         chiD=0.04555        Epot=125.2       Ekin=-4.125     2.029    5.981    
+Global flip succeeded: P=1 ratioD=1 ms=1
+  3000000 0     nf=8.008     <Sz>=0.04836    <s>=1          chiS0=1.533         chiD=0.04484        Epot=125.2       Ekin=-4.146     2.029    5.98     
+  3500000 0     nf=8.009     <Sz>=0.03972    <s>=1          chiS0=1.516         chiD=0.04462        Epot=125.2       Ekin=-4.149     2.029    5.98     
+Global flip succeeded: P=1 ratioD=1 ms=1
+  4000000 0     nf=8.009     <Sz>=0.01818    <s>=1          chiS0=1.514         chiD=0.04459        Epot=125.2       Ekin=-4.147     2.03     5.98     
+  4500000 0     nf=8.009     <Sz>=0.01741    <s>=1          chiS0=1.463         chiD=0.04482        Epot=125.2       Ekin=-4.15      2.029    5.98     
+Global flip succeeded: P=1 ratioD=1 ms=1
+  5000000 0     nf=8.009     <Sz>=0.0316     <s>=1          chiS0=1.479         chiD=0.04526        Epot=125.2       Ekin=-4.149     2.028    5.98     
+n_ab=[0.5079, 0.9968, 0.9967, 0.5082, 0.9965, 0.5065, 0.9968, 0.9967, 0.5064, 0.9965, ]
+n_tot=8.009
+s_oo[0]=34.01 
+S_1[0]=13.39 
+s_oo[1]=32.05 
+S_1[1]=10.81 
+s_oo[2]=32.05 
+S_1[2]=10.81 
+s_oo[3]=34.01 
+S_1[3]=13.4 
+s_oo[4]=32.05 
+S_1[4]=11.02 
+s_oo[5]=34.02 
+S_1[5]=13.39 
+s_oo[6]=32.05 
+S_1[6]=10.81 
+s_oo[7]=32.05 
+S_1[7]=10.81 
+s_oo[8]=34.02 
+S_1[8]=13.39 
+s_oo[9]=32.05 
+S_1[9]=11.02 
+s_oo=[34.01,32.05,]
+s_n1=[13.39,10.88,]

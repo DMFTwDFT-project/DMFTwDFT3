@@ -1,3 +1,4 @@
+#!/usr/bin/env python2
 import os,subprocess,re
 from scipy import *
 
@@ -173,12 +174,18 @@ class VASP_class:
       cmd="grep NELECT OUTCAR"
       out, err = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
       self.NELECT=float(out.split()[2]) 
+
    def Read_EFERMI(self):
-      cmd="grep Fermi OUTCAR | tail -n 1"
-      out, err = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-      val=re.search(r'(\d+\.?\d*);',out)
+      fi=open('OUTCAR','r')
+      for line in fi:
+         if re.search('Fermi energy',line) or re.search('E-fermi',line):
+            line_fermi=line
+      #print line_fermi
+      val=re.search(r'(\-?\d+\.?\d*)',line_fermi)
+      #print val
       self.EFERMI=float(val.group(1))
       savetxt('DFT_mu.out',array([self.EFERMI]))
+
    def Read_EBAND(self):
       cmd="grep EBANDS OUTCAR | tail -n 1"
       out, err = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()

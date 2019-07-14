@@ -5,6 +5,52 @@ import os,sys,copy
 import Fileio
 import scipy.interpolate
 
+def Interpolate(ommesh_input,data_input,ommesh_output,sorder):  
+
+   data_output=zeros((shape(data_input)[0],len(ommesh_output)),dtype=complex)
+   data_input=array(data_input)
+   for i in range(len(data_input)):
+      SSpline = scipy.interpolate.splrep(ommesh_input, data_input[i].real, k=sorder, s=0)
+      data_output[i,:] += scipy.interpolate.splev(ommesh_output, SSpline)
+      SSpline = scipy.interpolate.splrep(ommesh_input, data_input[i].imag, k=sorder, s=0)
+      data_output[i,:] += 1j*scipy.interpolate.splev(ommesh_output, SSpline)
+   return data_output
+
+def Fermi(eps):
+   if eps>100.0: return 0.0
+   elif eps<-100.0: return 1.0
+   else: return 1./(1.+exp(eps))
+
+def Compute_OCC(Np,Nm,d_orb):
+   OCC_loc=array(list((Np[:len(d_orb)]+Nm[:len(d_orb)])/2)+list((Np[:len(d_orb)]-Nm[:len(d_orb)])/2))
+   return OCC_loc
+
+def Compute_TrG1G2(om,G1,G2,T,small=1e-3):
+   TrG1G2=0.0
+   if abs(G1[-1])<small or abs(G2[-1])<small:
+      TrG1G2+=2*T*sum(G1*G2).real
+   else:
+      A=1.0/((1.0/G1[-1]).imag/om[-1]); B=(1.0/G1[-1]).real*A
+      G1_tail=zeros(len(om),dtype=complex)
+      G1_s=zeros(len(om),dtype=complex)
+      G1_tail=A/(1j*om+B)
+      G1_s=G1-A/(1j*om+B)
+      Ag=1.0/((1.0/G2[-1]).imag/om[-1]); Bg=(1.0/G2[-1]).real*Ag
+      G2_tail=zeros(len(om),dtype=complex)
+      G2_s=zeros(len(om),dtype=complex)
+      G2_tail=Ag/(1j*om+Bg)
+      G2_s=G2-Ag/(1j*om+Bg)
+      TrG1G2+=2*T*sum(G1_tail*G2_s).real
+      TrG1G2+=2*T*sum(G1_s*G2_tail).real
+      TrG1G2+=2*T*sum(G1_s*G2_s).real
+      if abs(B-Bg)<small:
+         TrG1G2+=exp(Bg/T)/(1+exp(Bg/T))**2/(2*T)
+         TrG1G2+=exp(B/T)/(1+exp(B/T))**2/(2*T)
+      else:
+         TrG1G2+=A*Ag*(Fermi(B/T)-Fermi(Bg/T))/(B-Bg)
+
+   return TrG1G2 
+
 class DMFT_class:
    """
    A general class to manipulate DMFT modules
@@ -15,13 +61,12 @@ class DMFT_class:
       cor_orb=p['cor_orb']
       self.cor_at=cor_at
       self.cor_orb=cor_orb
-      self.mu=0.0
-      self.EPOT=0.0
-      self.EPOT2=0.0
-      self.EDC=0.0
-      self.EKIN=0.0
-      self.EKIN0=0.0
-      self.Natom=zeros(len(self.cor_at),dtype=int)
+      if os.path.exists('DMFT_mu.out'):
+         self.mu=float(loadtxt('DMFT_mu.out'))
+      else: print "DMFT_mu.out file is missing"; exit()
+         
+      #self.Ed=array([loadtxt('Ed.out')])
+      #self.Natom=zeros(len(self.cor_at),dtype=int)
       self.Nd_latt=zeros(len(self.cor_at),dtype=float)
       self.VDC=zeros(len(self.cor_at),dtype=float)
       self.T=1.0/pC['beta'][0]
@@ -30,110 +75,162 @@ class DMFT_class:
       self.MOM=zeros((len(self.cor_at),TB.max_cor_orb),dtype=float)
       #for i in range(len(cor_at)): self.VDC[i]=(p['J'][i]-p['U'][i])/2.
 
-      self.nom=p['nom']
-      noms=p['noms']
-      nomlog=p['nomlog']
+      #self.nom=p['nom']
+      #noms=p['noms']
+      #nomlog=p['nomlog']
      
-      self.EqLogMesh(p['noms'],p['nomlog'],p['nom'],self.T)
+      #self.EqLogMesh(p['noms'],p['nomlog'],p['nom'],self.T)
 
-      for i,ats in enumerate(cor_at):
-         self.Natom[i]=len(cor_at[i])
+      #for i,ats in enumerate(cor_at):
+      #   self.Natom[i]=len(cor_at[i])
 
+   def Update_Sigoo_and_Vdc(self,TB,sig_file,nspin):
 
-   def Mix_Sig(self,nspin,mix_sig):
-      self.Sig=array(self.Sig_old)+mix_sig*(array(self.Sig)-array(self.Sig_old))
-      self.SigMdc=array(self.SigMdc_old)+mix_sig*(array(self.SigMdc)-array(self.SigMdc_old))
-      if nspin==2:
-         self.Sig_dn=array(self.Sig_dn_old)+mix_sig*(array(self.Sig_dn)-array(self.Sig_dn_old))
-         self.SigMdc_dn=array(self.SigMdc_dn_old)+mix_sig*(array(self.SigMdc_dn)-array(self.SigMdc_dn_old))
+      self.Sigoo=zeros((len(self.cor_at),2*TB.max_cor_orb),dtype=float)
+      self.Vdc=zeros(len(self.cor_at),dtype=float)
+      fi=open(sig_file,'r')
+      self.nom,self.ncor_orb=map(int,fi.readline()[16:].split())
+      fi.readline()
+      fi.readline()
+      Sigoo=eval(fi.readline()[8:])
+      Vdc=eval(fi.readline()[7:])
+      fi.close()
+      idx=0
+      for i,ats in enumerate(self.cor_at):
+         for j,orbs in enumerate(self.cor_orb[i]):
+            if len(orbs)>0: idx+=1
+      if self.ncor_orb!=nspin*idx: print "The number of correlated orbitals in sig.inp and INPUT.py is not consistent"; exit()
+               
+      idx2=0
+      for i,ats in enumerate(self.cor_at):
+         d_orb=TB.TB_orbs[ats[0]]
+         self.Vdc[i]=Vdc[idx2]
+         #self.Sigoo.append([]);#self.Vdc.append([])
+         for j,orbs in enumerate(self.cor_orb[i]):
+            if len(orbs)>0: 
+               for orb in orbs:
+                  self.Sigoo[i,d_orb.index(orb)]=Sigoo[idx2]
+                  if nspin==1:
+                     self.Sigoo[i,len(d_orb)+d_orb.index(orb)]=Sigoo[idx2]
+                  else:
+                     self.Sigoo[i,len(d_orb)+d_orb.index(orb)]=Sigoo[idx+idx2]
+               idx+=1
+      #print self.nom,self.ncor_orb
+      #print self.Sigoo, self.Vdc
+
+   def Compute_Energy(self,DFT,TB,ed):
+   #"""This module compute totoal energy using DMFT"""
+      self.ETOT=0.0
+      self.ETOT2=0.0
+      self.EPOT=0.0
+      self.EPOT2=0.0
+      self.EDC=0.0
+      self.EKIN=0.0
+      #self.EKIN0=0.0
+      DFT.Read_OSZICAR('OSZICAR')
+      ETOT_imp=0.0
+      TrDeltaG=0.0
+      for i,ats in enumerate(self.cor_at):
+         self.EPOT2+=len(ats)*self.TrSigG[i]
+         #E_KIN2+=len(ats)*DMFT.Ekin[i]
+         om,Delta=Fileio.Read_complex_multilines('imp.'+str(i)+'/Delta.inp')
+         om,G_loc=Fileio.Read_complex_multilines('G_loc.out')
+         #om2,Gf=Fileio.Read_complex_multilines('imp.'+str(i)+'/Gf.out',1)
+         #nom_s=min(len(om),len(om2))
+         for j,orbs in enumerate(self.cor_orb[i]):
+            TrDeltaG+=2*len(ats)*len(orbs)*Compute_TrG1G2(om,Delta[j],G_loc[j],self.T)
+            #TrDeltaG+=Compute_TrG1G2(om[:nom_s],Delta[j][:nom_s],Gf[j][:nom_s],self.T)
+         ETOT_imp+=len(ats)*(self.Ekin_imp[i]+self.Epot_imp[i]-self.mu_imp[i]*self.Nd_imp[i])
+      fiDMFT=open('INFO_KSUM','r')
+      Eline=fiDMFT.readlines()[-1:]
+      self.EKIN=float(Eline[0].split()[4])
+      fiDMFT.close()
+      om,Sig_loc=Fileio.Read_complex_multilines('sig.inp',5)
+      om,G_loc=Fileio.Read_complex_multilines('G_loc.out')
+      #print shape(Sig_loc)
+      #print shape(G_loc)
+      idx=-1
+      for i,ats in enumerate(self.cor_at):
+         d_orb=TB.TB_orbs[ats[0]]
+         for j,orbs in enumerate(self.cor_orb[i]):
+            idx+=1
+            self.EPOT+=len(ats)*len(orbs)*Compute_TrG1G2(om,Sig_loc[idx],G_loc[idx],self.T)
+            for orb in orbs:
+               # spin X2
+               self.EPOT+=0.5*len(ats)*self.Sigoo[i][j]*self.N_latt[i,d_orb.index(orb)]
+      VdcNd=0.0
+      VdcNd2=0.0
+      VdcNd3=0.0
+      for i,ats in enumerate(self.cor_at):
+         VdcNd2+=len(ats)*self.Vdc[i]*self.Nd_imp[i]#*DMFT.Nd_imp[i]**2
+         VdcNd3+=len(ats)*self.Vdc[i]*self.Nd_latt[i]
+         VdcNd+=len(ats)*self.mu*self.Nd_latt[i]
+         d_orb=TB.TB_orbs[ats[0]]
+         for j,orbs in enumerate(self.cor_orb[i]):
+            for orb in orbs:
+               VdcNd-=len(ats)*ed[i][j]*self.N_latt[i,d_orb.index(orb)]
+      #self.EPOT2=ETOT_imp-TrDeltaG+VdcNd+VdcNd3 
+      #print self.EPOT,self.EPOT2
+
+          
+
       
    def Read_Sig(self,TB,nspin):
-      self.Sigoo=[];SigMoo=[]
+      self.Sig=[]
       self.Nd_imp=zeros(len(self.cor_at),dtype=float)
       self.N_imp=zeros((len(self.cor_at),TB.max_cor_orb),dtype=float)
       self.MOM_imp=zeros((len(self.cor_at),TB.max_cor_orb),dtype=float)
-      self.Eimp=[]
+      self.Epot_imp=[]
+      self.Ekin_imp=[]
+      self.mu_imp=[]
+      self.TrSigG=[]
       for i,ats in enumerate(self.cor_at):
          d_orb=TB.TB_orbs[ats[0]]
-         fileSig='Sig'+str(i+1)+'.out'
-         if (os.path.exists(fileSig)): # If output file exists, start from previous iteration
-            (ommesh_long,Sig_file,TrS,Epot,nf_q,mom) = Fileio.Read_complex_Data(fileSig)
+         fileSig='imp.'+str(i)+'/Sig.out'
+         if (os.path.exists(fileSig)): 
+            (self.ommesh,Sig_file,TrS,Epot,nf_q,mom,Ekin,imp_mu) = Fileio.Read_complex_Data(fileSig)
             if len(Sig_file)!=nspin*len(self.cor_orb[i]): print "The number of correated orbital is not same as Sig file column"; exit()
             if len(mom)!=nspin*len(self.cor_orb[i]): print "The number of correated orbital is not same as mom list in Sig file"; exit()
-            if self.nom>len(ommesh_long): print "nom should be decreased!"; exit()
+            #if self.nom>len(ommesh_long): print "nom should be decreased!"; exit()
             self.Nd_imp[i]=nf_q
             for j,orbs in enumerate(self.cor_orb[i]):
                for orb in orbs:
                   self.N_imp[i,d_orb.index(orb)]=mom[j]/len(orbs)
                   #self.N_imp[TB.idx[at][orb]]=mom[j]/len(orbs)
-                  if nspin==2: 
+                  if nspin==2:
                      self.N_imp[i,d_orb.index(orb)]+=mom[j+len(self.cor_orb[i])]/len(orbs)
                      self.MOM_imp[i,d_orb.index(orb)]=(mom[j]-mom[j+len(self.cor_orb[i])])/len(orbs)
-            #self.Eimp.append(TrS-0.5*sum([mom[j]*Sig_file[j][-1].real for j in range(len(mom))])); #nf_qmc.append(list(mom))
-            self.Eimp.append(TrS); #nf_qmc.append(list(mom))
-            self.Sigoo.append(array(Sig_file[:,-1].real))
-            for iom in range(len(ommesh_long)):
-               Sig_file[:,iom]-=self.Sigoo[i]
-               for ii in range(nspin*len(self.cor_orb[i])):
-                  if Sig_file[ii,iom].imag >0: Sig_file[ii,iom]=Sig_file[ii,iom].real+0.0j
-            SigMoo.append(Interpolate(ommesh_long,Sig_file,self.ommesh,1))
-         else:
-            self.Eimp.append(0.0)
-            self.Sigoo.append([])
-            SigMoo.append([])
             for j in range(nspin*len(self.cor_orb[i])):
-               if j<len(self.cor_orb[i]):
-                  self.Sigoo[i].append(-0.1)
-               else: self.Sigoo[i].append(0.1) #Break symmetry
-               SigMoo[i].append(zeros(len(self.ommesh)))
-
-      self.Sig=zeros((len(TB.cor_idx),len(self.ommesh)),dtype=complex)
-      for i,ats in enumerate(self.cor_at):
-         for at in ats:
-            for j,orbs in enumerate(self.cor_orb[i]):
-               for orb in orbs:
-                  idx=TB.idx[at][orb]
-                  self.Sig[idx,:] = copy.deepcopy(SigMoo[i][j])
-      if (os.path.exists('SigMoo.out')):
-         omtemp,self.Sig_old=Fileio.Read_complex_multilines('SigMoo.out')
-      else: 
-         self.Sig_old=copy.deepcopy(self.Sig)
-
-      if nspin==2:
-         self.Sig_dn=zeros((len(TB.cor_idx),len(self.ommesh)),dtype=complex)
-         for i,ats in enumerate(self.cor_at):
-            for at in ats:
-               for j,orbs in enumerate(self.cor_orb[i]):
-                  for orb in orbs:
-                     idx=TB.idx[at][orb]
-                     self.Sig_dn[idx,:] = copy.deepcopy(SigMoo[i][j+len(self.cor_orb[i])])
-         if (os.path.exists('SigMoo_dn.out')):
-            omtemp,self.Sig_dn_old=Fileio.Read_complex_multilines('SigMoo_dn.out')
-         else: 
-            self.Sig_dn_old=copy.deepcopy(self.Sig_dn)
+               for iom in range(len(self.ommesh)):
+                  if Sig_file[j,iom].imag >0: Sig_file[j,iom]=Sig_file[j,iom].real+0.0j
+               self.Sig.append(Sig_file[j])
+               
+            self.TrSigG.append(TrS); 
+            self.Epot_imp.append(Epot); 
+            self.Ekin_imp.append(Ekin); 
+            self.mu_imp.append(imp_mu)
+      self.Sig=array(self.Sig)
 
    def Cmp_Sig_highT(self,T_high,noms_high,nspin):
       self.ommesh_highT=zeros(noms_high)
       for i in range(noms_high): self.ommesh_highT[i]=pi*T_high*(2*i+1)
-      self.Sig_highT=Interpolate(self.ommesh,self.Sig,self.ommesh_highT,1)
-      if nspin==2: self.Sig_dn_highT=Interpolate(self.ommesh,self.Sig_dn,self.ommesh_highT,1)
+      self.Sig_highT=Interpolate(self.ommesh,self.Sig,self.ommesh_highT,3)
+      if nspin==2: self.Sig_dn_highT=Interpolate(self.ommesh,self.Sig_dn,self.ommesh_highT,3)
          
-      
-   def Compute_HF(self,Nd_qmc,p,TB):
+
+   def Compute_Sigoo_and_Vdc(self,p,TB):
       """Compute Energy and Sigma"""
-      nspin=p['nspin'];U=p['U'];J=p['J'];dc_type=p['dc_type'];Uprime=p['Uprime']
-      self.VHF=zeros((len(self.cor_at),2*TB.max_cor_orb),dtype=float)
-      self.VHF_latt=zeros((len(self.cor_at),2*TB.max_cor_orb),dtype=float)
-      self.VHF_imp=zeros((len(self.cor_at),2*TB.max_cor_orb),dtype=float)
-      self.VDC=zeros(len(self.cor_at),dtype=float)
-      self.sig_st=[]#zeros(len(cor_at),dtype=float)
-      self.EHF=0.0#zeros(len(self.cor_at),dtype=float)
-      self.EHF_latt=0.0#zeros(len(self.cor_at),dtype=float)
-      self.EHF_imp=0.0#zeros(len(self.cor_at),dtype=float)
-      self.EDC=0.0;self.EDC_imp=0.0
+      nspin=p['nspin'];U=p['U'];J=p['J'];dc_type=p['dc_type'];alpha=p['alpha']
+      self.Sigoo=zeros((len(self.cor_at),2*TB.max_cor_orb),dtype=float)
+      self.Vdc=zeros(len(self.cor_at),dtype=float)
+      self.Sigoo_imp=zeros((len(self.cor_at),2*TB.max_cor_orb),dtype=float)
+      self.Vdc_imp=zeros(len(self.cor_at),dtype=float)
+      #self.Eoo=0.0#zeros(len(self.cor_at),dtype=float)
+      #self.Eoo_imp=0.0#zeros(len(self.cor_at),dtype=float)
+      self.Edc=0.0;self.Edc_imp=0.0
       #self.EHF_cor=zeros(len(self.cor_at),dtype=float)
-      self.SigMdc=zeros(TB.ncor_orb,dtype=float)
-      if nspin==2: self.SigMdc_dn=zeros(TB.ncor_orb,dtype=float)
+#      self.SigMdc=zeros(TB.ncor_orb,dtype=float)
+#      if nspin==2: self.SigMdc_dn=zeros(TB.ncor_orb,dtype=float)
       for i,ats in enumerate(self.cor_at):
          d_orb=TB.TB_orbs[ats[0]]
          fi=open('UC'+str(i+1)+'.dat','r')
@@ -142,80 +239,136 @@ class DMFT_class:
             UC.append(map(float,line.split()))
          if len(UC)!=2*len(d_orb): print "The size of UC is not consistent with orb"; exit()
          UC=array(UC)+U[i]-diag(ones(2*len(d_orb))*U[i])
-         if Nd_qmc==0:
-            OCC=array(list((self.N_latt[i][:len(d_orb)]+self.MOM[i][:len(d_orb)])/2)+list((self.N_latt[i][:len(d_orb)]-self.MOM[i][:len(d_orb)])/2))
-         else:
-            OCC=array(list((self.N_imp[i][:len(d_orb)]+self.MOM_imp[i][:len(d_orb)])/2)+list((self.N_imp[i][:len(d_orb)]-self.MOM_imp[i][:len(d_orb)])/2))
-         OCC_latt=array(list((self.N_latt[i][:len(d_orb)]+self.MOM[i][:len(d_orb)])/2)+list((self.N_latt[i][:len(d_orb)]-self.MOM[i][:len(d_orb)])/2))
-         OCC_imp=array(list((self.N_imp[i][:len(d_orb)]+self.MOM_imp[i][:len(d_orb)])/2)+list((self.N_imp[i][:len(d_orb)]-self.MOM_imp[i][:len(d_orb)])/2))
-         self.VHF[i,:2*len(d_orb)]=dot(UC,OCC)
-         self.VHF_latt[i,:2*len(d_orb)]=dot(UC,OCC_latt)
-         self.VHF_imp[i,:2*len(d_orb)]=dot(UC,OCC_imp)
+         OCC=Compute_OCC(self.N_latt[i],self.MOM[i],d_orb)
+         self.Sigoo[i,:2*len(d_orb)]=dot(UC,OCC)
+         OCC=Compute_OCC(self.N_imp[i],self.MOM_imp[i],d_orb)
+         self.Sigoo_imp[i,:2*len(d_orb)]=dot(UC,OCC)
 
-         ###### Compute VDC #######
+         ###### Compute VDC & EDC #######
          if dc_type==1:
-            if Nd_qmc==0:
-               self.VDC[i]=Uprime[i]*(self.Nd_latt[i]-0.5)-J[i]/2*(self.Nd_latt[i]-1)
-            else:
-               self.VDC[i]=Uprime[i]*(self.Nd_imp[i]-0.5)-J[i]/2*(self.Nd_imp[i]-1)
-
+            self.Vdc[i]=(U[i]-alpha[i])*(self.Nd_latt[i]-0.5)-J[i]/2*(self.Nd_latt[i]-1)
+            self.Vdc_imp[i]=(U[i]-alpha[i])*(self.Nd_imp[i]-0.5)-J[i]/2*(self.Nd_imp[i]-1)
+            self.Edc+=len(ats)*((U[i]-alpha[i])*self.Nd_latt[i]*(self.Nd_latt[i]-1)/2.0-J[i]*self.Nd_latt[i]*(self.Nd_latt[i]-2)/4.0)
+            self.Edc_imp+=len(ats)*((U[i]-alpha[i])*self.Nd_imp[i]*(self.Nd_imp[i]-1)/2.0-J[i]*self.Nd_imp[i]*(self.Nd_imp[i]-2)/4.0)
          elif dc_type==2:
-            if Nd_qmc==0:
-               self.VDC[i]=(Uprime[i]-2*J[i])*(0.9*self.Nd_latt[i])-J[i]/2*(2*self.Nd_latt[i]/5)
-            else:
-               self.VDC[i]=(Uprime[i]-2*J[i])*(0.9*self.Nd_imp[i])-J[i]/2*(2*self.Nd_imp[i]/5)
-         else: print "dc type is wrong!"; exit()
-
-         self.sig_st.append([])
-         for j,orbs in enumerate(self.cor_orb[i]):
-            self.sig_st[i].append(0.0)
-            for orb in orbs:
-               idx=d_orb.index(orb)
-               #for orb2 in orbs:
-               #   idx2=d_orb.index(orb2)
-               #   ########### This only works for one cor_orb #############
-               #   self.EHF_cor[i]+=0.5*(OCC[idx]*UC[idx,idx2]*OCC[idx2]+OCC[idx]*UC[idx,idx2+5]*OCC[idx2+5]+OCC[idx+5]*UC[idx+5,idx2]*OCC[idx2]+OCC[idx+5]*UC[idx+5,idx2+5]*OCC[idx2+5])
-               for orb2 in TB.TB_orbs[ats[0]]:
-                  if TB.cor_idx[TB.idx[ats[0]][orb2]]==1:
-                     idx2=d_orb.index(orb2)
-                     self.sig_st[i][j]+=UC[idx,idx2]*OCC[idx2]+UC[idx,idx2+len(d_orb)]*OCC[idx2+len(d_orb)]
-            self.sig_st[i][j]/=len(orbs)
-            for orb in orbs:
-               idx=d_orb.index(orb)
-               if nspin==1 and Nd_qmc>1: self.VHF[i,idx]=self.Sigoo[i][j]; self.VHF[i,idx+len(d_orb)]=self.Sigoo[i][j]
-               if nspin==2 and Nd_qmc>1: self.VHF[i,idx]=self.Sigoo[i][j]; self.VHF[i,idx+len(d_orb)]=self.Sigoo[i][j+len(self.cor_orb[i])]
-            self.sig_st[i][j]-=self.VDC[i]
-         self.EHF+=len(ats)*0.5*dot(OCC,self.VHF[i][:2*len(d_orb)])
-         self.EHF_imp+=len(ats)*0.5*dot(OCC_imp,self.VHF_imp[i][:2*len(d_orb)])
-         self.EHF_latt+=len(ats)*0.5*dot(OCC_latt,self.VHF_latt[i][:2*len(d_orb)])
-
-         if dc_type==1:
-            self.EDC+=len(ats)*(Uprime[i]*self.Nd_latt[i]*(self.Nd_latt[i]-1)/2.0-J[i]*self.Nd_latt[i]*(self.Nd_latt[i]-2)/4.0)
-            self.EDC_imp+=len(ats)*(Uprime[i]*self.Nd_imp[i]*(self.Nd_imp[i]-1)/2.0-J[i]*self.Nd_imp[i]*(self.Nd_imp[i]-2)/4.0)
-         elif dc_type==2:
-            self.EDC+=self.Natom[i]*(Uprime[i]*self.Nd_latt[i]*(0.9*self.Nd_latt[i])/2-5*J[i]*self.Nd_latt[i]/2*(2*self.Nd_latt[i]/5))
-            self.EDC_imp+=self.Natom[i]*(Uprime[i]*self.Nd_imp[i]*(0.9*self.Nd_imp[i])/2-5*J[i]*self.Nd_imp[i]/2*(2*self.Nd_imp[i]/5))
+            self.Vdc[i]=U[i]*(self.Nd_latt[i]-alpha[i]-0.5)-J[i]/2*(self.Nd_latt[i]-alpha[i]-1)
+            self.Vdc_imp[i]=U[i]*(self.Nd_imp[i]-alpha[i]-0.5)-J[i]/2*(self.Nd_imp[i]-alpha[i]-1)
+            self.Edc+=len(ats)*(U[i]*(self.Nd_latt[i]-alpha[i])*(self.Nd_latt[i]-alpha[i]-1)/2.0-J[i]*(self.Nd_latt[i]-alpha[i])*(self.Nd_latt[i]-alpha[i]-2)/4.0)
+            self.Edc_imp+=len(ats)*(U[i]*(self.Nd_imp[i]-alpha[i])*(self.Nd_imp[i]-alpha[i]-1)/2.0-J[i]*(self.Nd_imp[i]-alpha[i])*(self.Nd_imp[i]-alpha[i]-2)/4.0)
+         elif dc_type==3:
+            self.Vdc[i]=U[i]*(self.Nf[i]-0.5)-J[i]/2*(self.Nf[i]-1)
+            self.Vdc_imp[i]=U[i]*(self.Nf[i]-0.5)-J[i]/2*(self.Nf[i]-1)
          else: print "This dc type is not supported!"; exit()
 
-         for at in ats:
-            for orb in TB.TB_orbs[at]:
-               idx=TB.idx[at][orb]
-               self.SigMdc[idx] = self.VHF[i,d_orb.index(orb)]-self.VDC[i]
-         if nspin==2: 
-            for at in ats:
-               for orb in TB.TB_orbs[at]:
-                  idx=TB.idx[at][orb]
-                  self.SigMdc_dn[idx] = self.VHF[i,d_orb.index(orb)+len(d_orb)]-self.VDC[i]
-      if (os.path.exists('SigMdc.out')):
-         self.SigMdc_old=Fileio.Read_float('SigMdc.out')
-      else: 
-         self.SigMdc_old=copy.deepcopy(self.SigMdc)
-      if nspin==2:
-         if (os.path.exists('SigMdc_dn.out')):
-            self.SigMdc_dn_old=Fileio.Read_float('SigMdc_dn.out')
-         else:
-            self.SigMdc_dn_old=copy.deepcopy(self.SigMdc_dn)
+        # self.EHF+=len(ats)*0.5*dot(OCC,self.VHF[i][:2*len(d_orb)])
+        # self.EHF_imp+=len(ats)*0.5*dot(OCC_imp,self.VHF_imp[i][:2*len(d_orb)])
+        # self.EHF_latt+=len(ats)*0.5*dot(OCC_latt,self.VHF_latt[i][:2*len(d_orb)])
 
+#         for at in ats:
+#            for orb in TB.TB_orbs[at]:
+#               idx=TB.idx[at][orb]
+#               self.SigMdc[idx] = self.VHF[i,d_orb.index(orb)]-self.VDC[i]
+#         if nspin==2: 
+#            for at in ats:
+#               for orb in TB.TB_orbs[at]:
+#                  idx=TB.idx[at][orb]
+#                  self.SigMdc_dn[idx] = self.VHF[i,d_orb.index(orb)+len(d_orb)]-self.VDC[i]
+#      if (os.path.exists('SigMdc.out')):
+#         self.SigMdc_old=Fileio.Read_float('SigMdc.out')
+#      else: 
+#         self.SigMdc_old=copy.deepcopy(self.SigMdc)
+#      if nspin==2:
+#         if (os.path.exists('SigMdc_dn.out')):
+#            self.SigMdc_dn_old=Fileio.Read_float('SigMdc_dn.out')
+#         else:
+#            self.SigMdc_dn_old=copy.deepcopy(self.SigMdc_dn)
+
+   def Symmetrize_orb(self,TB,data,nspin):
+      out=[]
+      for i,ats in enumerate(self.cor_at):
+         d_orb=TB.TB_orbs[ats[0]]
+         for j,orbs in enumerate(self.cor_orb[i]):
+            data_loc=0.0
+            for orb in orbs:
+               data_loc+=data[i,d_orb.index(orb)]
+            data_loc/=len(orbs)
+            out.append(data_loc)
+         if nspin==2:
+            for j,orbs in enumerate(self.cor_orb[i]):
+               data_loc=0.0
+               for orb in orbs:
+                  data_loc+=data[i,d_orb.index(orb)+len(d_orb)]
+               data_loc/=len(orbs)
+               out.append(data_loc)  
+
+      return out
+          
+      
+
+   def Mix_Sig_and_Print_sig_inp(self,TB,Nd_qmc,mix_sig,sig_file,nspin):
+      fi=open(sig_file,'r')
+      self.nom,self.ncor_orb=map(int,fi.readline()[16:].split())
+      fi.readline()
+      fi.readline()
+      Sigoo_old=eval(fi.readline()[8:])
+      Vdc_old=eval(fi.readline()[7:])
+      fi.close()
+      om,Sig_old=Fileio.Read_complex_multilines(sig_file,5)
+      sym_Sigoo=self.Symmetrize_orb(TB,self.Sigoo,nspin)
+      sym_Sigoo_imp=self.Symmetrize_orb(TB,self.Sigoo_imp,nspin)
+      sym_Vdc=[];sym_Vdc_imp=[]
+      for i,ats in enumerate(self.cor_at):
+         for j,orbs in enumerate(self.cor_orb[i]):
+            sym_Vdc.append(self.Vdc[i])
+            sym_Vdc_imp.append(self.Vdc_imp[i])
+         if nspin==2:
+            for j,orbs in enumerate(self.cor_orb[i]):
+               sym_Vdc.append(self.Vdc[i])
+               sym_Vdc_imp.append(self.Vdc_imp[i])
+               
+      #print self.Sigoo_imp,sym_Sigoo_imp
+      #print array(Sigoo_old),sym_Sigoo_imp
+      if Nd_qmc==1:
+         new_Sigoo=array(Sigoo_old)+mix_sig*(array(sym_Sigoo_imp)-array(Sigoo_old))
+         new_Vdc=array(Vdc_old)+mix_sig*(array(sym_Vdc_imp)-array(Vdc_old))
+      else: 
+         new_Sigoo=array(Sigoo_old)+mix_sig*(array(sym_Sigoo)-array(Sigoo_old))
+         new_Vdc=array(Vdc_old)+mix_sig*(array(sym_Vdc)-array(Vdc_old))
+      #print new_Sigoo,new_Vdc
+      self.SigMdc=new_Sigoo-new_Vdc
+      #print self.SigMdc
+      #print om, self.ommesh
+      for i in range(len(self.Sig)):
+         self.Sig[i,:]-=sym_Sigoo_imp[i] 
+      #print self.Sig
+      if len(om)!=len(self.ommesh):
+         Sig_old=Interpolate(om,Sig_old,self.ommesh,3)
+         self.nom=len(self.ommesh)
+      self.Sig=Sig_old+mix_sig*(self.Sig-Sig_old)
+      #print self.Sig
+      #print shape(self.Sig)
+      header1='# nom,ncor_orb= '+str(self.nom)+' '+str(self.ncor_orb)
+      header2='# T= %18.15f'%(self.T)#+str(self.T)
+      header3='# s_oo-Vdc= '
+      for i in range(self.ncor_orb):
+         header3+='%18.15f '%(self.SigMdc[i])
+      header4='# s_oo= '+str(new_Sigoo.tolist())
+      header5='# Vdc= '+str(new_Vdc.tolist())
+      #print header1
+      #print header2
+      #print header3
+      #print header4
+      #print header5
+      Fileio.Print_complex_multilines(self.Sig,self.ommesh,'sig.inp',[header1,header2,header3,header4,header5])
+ 
+      
+      
+
+#      self.Sig=array(self.Sig_old)+mix_sig*(array(self.Sig)-array(self.Sig_old))
+#      self.SigMdc=array(self.SigMdc_old)+mix_sig*(array(self.SigMdc)-array(self.SigMdc_old))
+#      if nspin==2:
+#         self.Sig_dn=array(self.Sig_dn_old)+mix_sig*(array(self.Sig_dn)-array(self.Sig_dn_old))
+#         self.SigMdc_dn=array(self.SigMdc_dn_old)+mix_sig*(array(self.SigMdc_dn)-array(self.SigMdc_dn_old))
 
    def Compute_Delta(self,T,nspin,cor_at,cor_orb,TB,nom,delta=0.0):
    #####  Store local Green function and local Self energy with equidistant mesh as a list type ##########
@@ -282,7 +435,7 @@ class DMFT_class:
          ######  Interpolate Delta ####
          ommesh_new=pi*T*(2*arange(nom)+1)
    
-         Delta=Interpolate(ommesh,Delta_s,ommesh_new,1)
+         Delta=Interpolate(ommesh,Delta_s,ommesh_new,3)
          Fileio.Print_complex_multilines(Delta,ommesh_new,'Delta'+str(i+1)+'.inp')
       return DMFT_mu,ed#,sig_st
 
@@ -357,7 +510,7 @@ class DMFT_class:
       self.N_latt=zeros((len(self.cor_at),TB.max_cor_orb),dtype=float)
       self.MOM=zeros((len(self.cor_at),TB.max_cor_orb),dtype=float)
       self.Nd_latt=zeros(len(self.cor_at),dtype=float)
-      line=open('DMINFO','r').readlines()[-1].split()
+      line=open('INFO_DM','r').readlines()[-1].split()
       for i,ats in enumerate(self.cor_at):
          d_orb=TB.TB_orbs[ats[0]]
          for at in ats:
@@ -435,8 +588,8 @@ class DMFT_class:
          dGf_loc=[]; Sig_loc=[]
          for i in range(len(self.dGLOC)):
             dGf_loc.append([]); Sig_loc.append([])
-            Gf_intpol=Interpolate(self.ommesh,self.dGLOC[i],ommesh_new,1)
-            Sig_intpol=Interpolate(self.ommesh,self.SIGLOC[i],ommesh_new,1)
+            Gf_intpol=Interpolate(self.ommesh,self.dGLOC[i],ommesh_new,3)
+            Sig_intpol=Interpolate(self.ommesh,self.SIGLOC[i],ommesh_new,3)
             for j in range(len(self.dGLOC[i])):
                dGf_loc[i].append(list(Gf_intpol[j]))
                Sig_loc[i].append(list(Sig_intpol[j]))
@@ -470,8 +623,8 @@ class DMFT_class:
       Gf_loc=[]; Sig_loc=[]
       for i in range(len(self.GLOC)):
          Gf_loc.append([]); Sig_loc.append([])
-         Gf_intpol=Interpolate(self.ommesh,self.GLOC[i],ommesh_new,1)
-         Sig_intpol=Interpolate(self.ommesh,self.SIGLOC[i],ommesh_new,1)
+         Gf_intpol=Interpolate(self.ommesh,self.GLOC[i],ommesh_new,3)
+         Sig_intpol=Interpolate(self.ommesh,self.SIGLOC[i],ommesh_new,3)
          for j in range(len(self.GLOC[i])):
             Gf_loc[i].append(list(Gf_intpol[j]))
             Sig_loc[i].append(list(Sig_intpol[j]))
@@ -518,13 +671,26 @@ class DMFT_class:
          Fileio.Print_complex_multilines(array([self.Gloc[i] for i in range(TB.idx[at][TB.TB_orbs[at][0]],TB.idx[at][TB.TB_orbs[at][-1]]+1)]),self.ommesh,'G_loc_'+at+'.out')
 
 
-def Interpolate(ommesh_input,data_input,ommesh_output,sorder):  
 
-   data_output=zeros((shape(data_input)[0],len(ommesh_output)),dtype=complex)
-   data_input=array(data_input)
-   for i in range(len(data_input)):
-      SSpline = scipy.interpolate.splrep(ommesh_input, data_input[i].real, k=sorder, s=0)
-      data_output[i,:] += scipy.interpolate.splev(ommesh_output, SSpline)
-      SSpline = scipy.interpolate.splrep(ommesh_input, data_input[i].imag, k=sorder, s=0)
-      data_output[i,:] += 1j*scipy.interpolate.splev(ommesh_output, SSpline)
-   return data_output
+if __name__=='__main__':
+
+   import Struct,VASP
+
+   execfile('INPUT.py') # Read input file
+   TB=Struct.TBstructure('POSCAR',p['atomnames'],p['orbs'])
+   cor_at=p['cor_at']; cor_orb=p['cor_orb']
+   TB.Compute_cor_idx(cor_at,cor_orb)
+   print TB.TB_orbs
+   DFT=VASP.VASP_class()
+   DMFT=DMFT_class(p,pC,TB)
+   DMFT.Update_Sigoo_and_Vdc(TB,'sig.inp')
+   DMFT.Update_Nlatt(TB,p['nspin'])
+   DMFT.Read_Sig(TB,p['nspin'])
+   #print DMFT.Sig
+   #DMFT.Compute_Sigoo_and_Vdc(Nd_qmc,p,TB)
+   ed=array([loadtxt('Ed.out')])
+   #print ed
+   DMFT.Compute_Energy(DFT,TB,ed) 
+   DMFT.Compute_Sigoo_and_Vdc(p,TB)
+   DMFT.Mix_Sig_and_Print_sig_inp(TB,p['Nd_qmc'],p['mix_sig'],'sig.inp')
+

@@ -1,10 +1,13 @@
+#!/usr/bin/env python
 from scipy import *
 import sys, copy, re
 
-def Read_complex_multilines(D_name):
+def Read_complex_multilines(D_name,skipline=0):
    """ This function reads Sig.out file """
    print "Reading a file ",D_name
    fi=open(D_name,'r')
+   for i in range(skipline):
+      fi.readline()
    lines=fi.readlines()
    fi.close()
    m=len(lines[0].split())
@@ -48,9 +51,13 @@ def Read_complex_Data(D_name):
    print "Reading a file ",D_name
    fi=open(D_name,'r')
    line=fi.readline()
-   val=re.search(r'TrSigmaG=(\d+\.?\d*)',line)
+   val=re.search(r'TrSigmaG=(\-?\d+\.?\d*)',line)
    TrSigmaG=float(val.group(1))
-   val=re.search(r'Epot=(\d+\.?\d*)',line)
+   val=re.search(r'mu=(\-?\d+\.?\d*)',line)
+   mu=float(val.group(1))
+   val=re.search(r'Ekin=(\-?\d+\.?\d*)',line)
+   Ekin=float(val.group(1))
+   val=re.search(r'Epot=(\-?\d+\.?\d*)',line)
    Epot=float(val.group(1))
    val=re.search(r'nf=(\d+\.?\d*)',line)
    nf_q=float(val.group(1))
@@ -74,7 +81,7 @@ def Read_complex_Data(D_name):
       print "Something is wrong!"
       sys.exit(1)
 
-   return (om_data,Data,TrSigmaG,Epot,nf_q,mom)
+   return (om_data,Data,TrSigmaG,Epot,nf_q,mom,Ekin,mu)
 
 def Print_complex(data,mesh,filename):
    n1=len(mesh)
@@ -83,14 +90,16 @@ def Print_complex(data,mesh,filename):
       print >>fi, "%.14f " %(mesh[i]),
       print >>fi, "%.14f %.14f " %(data[i].real, data[i].imag)
 
-def Print_complex_multilines(data,mesh,filename):
+def Print_complex_multilines(data,mesh,filename,headers=[]):
    n0=len(data)
    n1=len(mesh)
    fi=open(filename,'w')
+   for header in headers:
+      print >>fi, header
    for i in range(n1):
       for j in range(n0):
-         if j==0: print >>fi, "%.14f " %(mesh[i]),
-         print >>fi, "%.14f %.14f " %(data[j,i].real, data[j,i].imag),
+         if j==0: print >>fi, "%20.15f " %(mesh[i]),
+         print >>fi, "%20.15f %20.15f " %(data[j,i].real, data[j,i].imag),
       print >>fi, ""
 
 def Print_float(data,filename):
@@ -105,7 +114,32 @@ def Read_float(filename):
    Data=array(map(float,fi.readline().split()))
    return Data
 
-def Creat_INPUT(p,pC,TB,T_high,noms_high,LFORCE=".FALSE."):
+def Create_dmft_params(p,pC,N_atoms,atm_idx,sym_idx):
+   f = open('dmft_params.dat', 'w')
+   print >> f, "# Number of k-points in Wannier basis="
+   print >> f, p['q'][0], p['q'][1], p['q'][2]
+   print >> f, "# Total number of electrons="
+   print >> f, p['n_tot']
+#   print >> f, "# Temperature [eV]="
+#   print >> f, 1.0/pC['beta'][0]
+   print >> f, "# Number of om points for k-sum"
+   print >> f, p['noms']
+   print >> f, "# Number of iterations for mu"
+   print >> f, p['mu_iter']
+   print >> f, "# Number of total spin"
+   print >> f, p['nspin']
+   print >> f, "# Number of total correlated atoms"
+   print >> f, N_atoms
+   print >> f, "# Number of correlated orbitals per atom"
+   print >> f, len(sym_idx[atm_idx[0]])
+   print >> f, "# Orbital index for the self-energy at each atom"
+   for i in range(N_atoms):
+      for j in range(len(sym_idx[atm_idx[i]])):
+         print >> f, sym_idx[atm_idx[i]][j],
+      print >> f,''
+   f.close()
+
+def Create_INPUT(p,pC,TB,T_high,noms_high,LFORCE=".FALSE."):
    atm_idx=[]
    idx=1
    for ats in p['cor_at']:
@@ -144,7 +178,7 @@ def Creat_INPUT(p,pC,TB,T_high,noms_high,LFORCE=".FALSE."):
       print >> f, p['J'][atm_idx[i]-1],
    print >> f, ''
    for i in range(len(atm_idx)):
-      print >> f, p['Uprime'][atm_idx[i]-1],
+      print >> f, p['alpha'][atm_idx[i]-1],
    print >> f, ''
    f.close()
    if TB.LHF==".FALSE.":
@@ -158,6 +192,7 @@ def Creat_INPUT(p,pC,TB,T_high,noms_high,LFORCE=".FALSE."):
          print >> f, atm_idx[i],
       print >> f, ''
       print >> f, 1.0/pC['beta'][0]
+#      print >> f, p['Nd_f'] 
       print >> f, p['n_tot']
       print >> f, p['mu_iter']
       print >> f, p['mix_sig']
@@ -165,7 +200,7 @@ def Creat_INPUT(p,pC,TB,T_high,noms_high,LFORCE=".FALSE."):
          print >> f, p['U'][atm_idx[i]-1],
       print >> f, '' 
       for i in range(len(atm_idx)):
-         print >> f, p['Uprime'][atm_idx[i]-1],
+         print >> f, p['alpha'][atm_idx[i]-1],
       print >> f, '' 
       for i in range(len(atm_idx)):
          print >> f, p['J'][atm_idx[i]-1],
@@ -185,7 +220,7 @@ def Creat_INPUT(p,pC,TB,T_high,noms_high,LFORCE=".FALSE."):
          print >> f, p['U'][atm_idx[i]-1],
       print >> f, ''
       for i in range(len(atm_idx)):
-         print >> f, p['Uprime'][atm_idx[i]-1],
+         print >> f, p['alpha'][atm_idx[i]-1],
       print >> f, ''
       for i in range(len(atm_idx)):
          print >> f, p['J'][atm_idx[i]-1],

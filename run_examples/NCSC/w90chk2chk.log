@@ -1,0 +1,26 @@
+ Reading information from file wannier90.chk :
+ written on  9May2019 at 18:59:10
+Number of bands: 46
+Excluded bands: none.
+Real lattice: read.
+Reciprocal lattice: read.
+Num kpts:512
+mp_grid: read.
+kpt_latt: read.
+nntot:8
+num_wann:28
+checkpoint: postwann
+have_disentangled: TRUE
+omega_invariant: read.
+lwindow: read.
+ndimwin: read.
+U_matrix_opt: read.
+U_matrix: read.
+M_matrix: read.
+wannier_centres: read.
+wannier_spreads: read.
+ ... done
+
+
+ Writing formatted checkpoint file wannier90.chk.fmt... done
+

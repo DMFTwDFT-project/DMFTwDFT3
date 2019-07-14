@@ -1,0 +1,181 @@
+-----------Charge Self-consistent DFT+DMFT calculations-----------
+Caculation Starts at Thu May  9 19:12:11 2019
+--- Starting Charge loop 1 at Thu May  9 19:12:12 2019---
+--- Starting DMFT loop 1 at Thu May  9 19:12:12 2019---
+--- DMFT Ksum is finished  at Thu May  9 19:14:10 2019---
+--- Impurity solver is finished  at Thu May  9 19:23:05 2019---
+--- Running vaspCHG  at Thu May  9 19:23:05 2019---
+-------------- Running wannier 90 1----------------
+--- Starting Charge loop 2 at Thu May  9 19:36:54 2019---
+--- Starting DMFT loop 1 at Thu May  9 19:36:54 2019---
+--- DMFT Ksum is finished  at Thu May  9 19:38:44 2019---
+--- Impurity solver is finished  at Thu May  9 19:48:17 2019---
+--- Running vaspCHG  at Thu May  9 19:48:17 2019---
+-------------- Running wannier 90 2----------------
+--- Starting Charge loop 3 at Thu May  9 20:02:07 2019---
+--- Starting DMFT loop 1 at Thu May  9 20:02:07 2019---
+--- DMFT Ksum is finished  at Thu May  9 20:03:55 2019---
+--- Impurity solver is finished  at Thu May  9 20:13:23 2019---
+--- Running vaspCHG  at Thu May  9 20:13:23 2019---
+-------------- Running wannier 90 3----------------
+--- Starting Charge loop 4 at Thu May  9 20:25:49 2019---
+--- Starting DMFT loop 1 at Thu May  9 20:25:49 2019---
+--- DMFT Ksum is finished  at Thu May  9 20:27:37 2019---
+--- Impurity solver is finished  at Thu May  9 20:37:05 2019---
+--- Running vaspCHG  at Thu May  9 20:37:05 2019---
+-------------- Running wannier 90 4----------------
+--- Starting Charge loop 5 at Thu May  9 20:48:41 2019---
+--- Starting DMFT loop 1 at Thu May  9 20:48:41 2019---
+--- DMFT Ksum is finished  at Thu May  9 20:50:29 2019---
+--- Impurity solver is finished  at Thu May  9 20:59:50 2019---
+--- Running vaspCHG  at Thu May  9 20:59:50 2019---
+-------------- Running wannier 90 5----------------
+--- Starting Charge loop 6 at Thu May  9 21:11:25 2019---
+--- Starting DMFT loop 1 at Thu May  9 21:11:25 2019---
+--- DMFT Ksum is finished  at Thu May  9 21:13:15 2019---
+--- Impurity solver is finished  at Thu May  9 21:22:36 2019---
+--- Running vaspCHG  at Thu May  9 21:22:37 2019---
+-------------- Running wannier 90 6----------------
+--- Starting Charge loop 7 at Thu May  9 21:34:12 2019---
+--- Starting DMFT loop 1 at Thu May  9 21:34:12 2019---
+--- DMFT Ksum is finished  at Thu May  9 21:36:00 2019---
+--- Impurity solver is finished  at Thu May  9 21:45:15 2019---
+--- Running vaspCHG  at Thu May  9 21:45:15 2019---
+-------------- Running wannier 90 7----------------
+--- Starting Charge loop 8 at Thu May  9 21:56:24 2019---
+--- Starting DMFT loop 1 at Thu May  9 21:56:24 2019---
+--- DMFT Ksum is finished  at Thu May  9 21:58:13 2019---
+--- Impurity solver is finished  at Thu May  9 22:07:32 2019---
+--- Running vaspCHG  at Thu May  9 22:07:32 2019---
+-------------- Running wannier 90 8----------------
+--- Starting Charge loop 9 at Thu May  9 22:19:07 2019---
+--- Starting DMFT loop 1 at Thu May  9 22:19:07 2019---
+--- DMFT Ksum is finished  at Thu May  9 22:20:57 2019---
+--- Impurity solver is finished  at Thu May  9 22:30:16 2019---
+--- Running vaspCHG  at Thu May  9 22:30:16 2019---
+-------------- Running wannier 90 9----------------
+--- Starting Charge loop 10 at Thu May  9 22:41:54 2019---
+--- Starting DMFT loop 1 at Thu May  9 22:41:54 2019---
+--- DMFT Ksum is finished  at Thu May  9 22:43:44 2019---
+--- Impurity solver is finished  at Thu May  9 22:52:57 2019---
+--- Running vaspCHG  at Thu May  9 22:52:57 2019---
+-------------- Running wannier 90 10----------------
+--- Starting Charge loop 11 at Thu May  9 23:04:35 2019---
+--- Starting DMFT loop 1 at Thu May  9 23:04:35 2019---
+--- DMFT Ksum is finished  at Thu May  9 23:06:24 2019---
+--- Impurity solver is finished  at Thu May  9 23:15:42 2019---
+--- Running vaspCHG  at Thu May  9 23:15:43 2019---
+-------------- Running wannier 90 11----------------
+--- Starting Charge loop 12 at Thu May  9 23:27:23 2019---
+--- Starting DMFT loop 1 at Thu May  9 23:27:23 2019---
+--- DMFT Ksum is finished  at Thu May  9 23:29:14 2019---
+--- Impurity solver is finished  at Thu May  9 23:38:35 2019---
+--- Running vaspCHG  at Thu May  9 23:38:35 2019---
+-------------- Running wannier 90 12----------------
+--- Starting Charge loop 13 at Thu May  9 23:50:17 2019---
+--- Starting DMFT loop 1 at Thu May  9 23:50:17 2019---
+--- DMFT Ksum is finished  at Thu May  9 23:52:07 2019---
+--- Impurity solver is finished  at Fri May 10 00:01:22 2019---
+--- Running vaspCHG  at Fri May 10 00:01:22 2019---
+-------------- Running wannier 90 13----------------
+--- Starting Charge loop 14 at Fri May 10 00:12:55 2019---
+--- Starting DMFT loop 1 at Fri May 10 00:12:55 2019---
+--- DMFT Ksum is finished  at Fri May 10 00:14:43 2019---
+--- Impurity solver is finished  at Fri May 10 00:24:00 2019---
+--- Running vaspCHG  at Fri May 10 00:24:00 2019---
+-------------- Running wannier 90 14----------------
+--- Starting Charge loop 15 at Fri May 10 00:35:32 2019---
+--- Starting DMFT loop 1 at Fri May 10 00:35:32 2019---
+--- DMFT Ksum is finished  at Fri May 10 00:37:19 2019---
+--- Impurity solver is finished  at Fri May 10 00:46:30 2019---
+--- Running vaspCHG  at Fri May 10 00:46:30 2019---
+-------------- Running wannier 90 15----------------
+--- Starting Charge loop 16 at Fri May 10 00:58:01 2019---
+--- Starting DMFT loop 1 at Fri May 10 00:58:01 2019---
+--- DMFT Ksum is finished  at Fri May 10 00:59:49 2019---
+--- Impurity solver is finished  at Fri May 10 01:09:05 2019---
+--- Running vaspCHG  at Fri May 10 01:09:05 2019---
+-------------- Running wannier 90 16----------------
+--- Starting Charge loop 17 at Fri May 10 01:20:38 2019---
+--- Starting DMFT loop 1 at Fri May 10 01:20:38 2019---
+--- DMFT Ksum is finished  at Fri May 10 01:22:25 2019---
+--- Impurity solver is finished  at Fri May 10 01:31:43 2019---
+--- Running vaspCHG  at Fri May 10 01:31:43 2019---
+-------------- Running wannier 90 17----------------
+--- Starting Charge loop 18 at Fri May 10 01:43:16 2019---
+--- Starting DMFT loop 1 at Fri May 10 01:43:16 2019---
+--- DMFT Ksum is finished  at Fri May 10 01:45:04 2019---
+--- Impurity solver is finished  at Fri May 10 01:54:18 2019---
+--- Running vaspCHG  at Fri May 10 01:54:18 2019---
+-------------- Running wannier 90 18----------------
+--- Starting Charge loop 19 at Fri May 10 02:05:48 2019---
+--- Starting DMFT loop 1 at Fri May 10 02:05:48 2019---
+--- DMFT Ksum is finished  at Fri May 10 02:07:36 2019---
+--- Impurity solver is finished  at Fri May 10 02:16:46 2019---
+--- Running vaspCHG  at Fri May 10 02:16:47 2019---
+-------------- Running wannier 90 19----------------
+--- Starting Charge loop 20 at Fri May 10 02:28:18 2019---
+--- Starting DMFT loop 1 at Fri May 10 02:28:18 2019---
+--- DMFT Ksum is finished  at Fri May 10 02:30:05 2019---
+--- Impurity solver is finished  at Fri May 10 02:39:14 2019---
+--- Running vaspCHG  at Fri May 10 02:39:14 2019---
+-------------- Running wannier 90 20----------------
+--- Starting Charge loop 21 at Fri May 10 02:50:45 2019---
+--- Starting DMFT loop 1 at Fri May 10 02:50:45 2019---
+--- DMFT Ksum is finished  at Fri May 10 02:52:33 2019---
+--- Impurity solver is finished  at Fri May 10 03:01:46 2019---
+--- Running vaspCHG  at Fri May 10 03:01:46 2019---
+-------------- Running wannier 90 21----------------
+--- Starting Charge loop 22 at Fri May 10 03:13:21 2019---
+--- Starting DMFT loop 1 at Fri May 10 03:13:21 2019---
+--- DMFT Ksum is finished  at Fri May 10 03:15:08 2019---
+--- Impurity solver is finished  at Fri May 10 03:24:19 2019---
+--- Running vaspCHG  at Fri May 10 03:24:19 2019---
+-------------- Running wannier 90 22----------------
+--- Starting Charge loop 23 at Fri May 10 03:35:50 2019---
+--- Starting DMFT loop 1 at Fri May 10 03:35:50 2019---
+--- DMFT Ksum is finished  at Fri May 10 03:37:42 2019---
+--- Impurity solver is finished  at Fri May 10 03:46:56 2019---
+--- Running vaspCHG  at Fri May 10 03:46:57 2019---
+-------------- Running wannier 90 23----------------
+--- Starting Charge loop 24 at Fri May 10 03:58:28 2019---
+--- Starting DMFT loop 1 at Fri May 10 03:58:28 2019---
+--- DMFT Ksum is finished  at Fri May 10 04:00:15 2019---
+--- Impurity solver is finished  at Fri May 10 04:09:25 2019---
+--- Running vaspCHG  at Fri May 10 04:09:25 2019---
+-------------- Running wannier 90 24----------------
+--- Starting Charge loop 25 at Fri May 10 04:20:35 2019---
+--- Starting DMFT loop 1 at Fri May 10 04:20:35 2019---
+--- DMFT Ksum is finished  at Fri May 10 04:22:22 2019---
+--- Impurity solver is finished  at Fri May 10 04:31:36 2019---
+--- Running vaspCHG  at Fri May 10 04:31:36 2019---
+-------------- Running wannier 90 25----------------
+--- Starting Charge loop 26 at Fri May 10 04:43:05 2019---
+--- Starting DMFT loop 1 at Fri May 10 04:43:05 2019---
+--- DMFT Ksum is finished  at Fri May 10 04:44:53 2019---
+--- Impurity solver is finished  at Fri May 10 04:54:06 2019---
+--- Running vaspCHG  at Fri May 10 04:54:06 2019---
+-------------- Running wannier 90 26----------------
+--- Starting Charge loop 27 at Fri May 10 05:05:13 2019---
+--- Starting DMFT loop 1 at Fri May 10 05:05:13 2019---
+--- DMFT Ksum is finished  at Fri May 10 05:07:00 2019---
+--- Impurity solver is finished  at Fri May 10 05:16:15 2019---
+--- Running vaspCHG  at Fri May 10 05:16:15 2019---
+-------------- Running wannier 90 27----------------
+--- Starting Charge loop 28 at Fri May 10 05:27:18 2019---
+--- Starting DMFT loop 1 at Fri May 10 05:27:18 2019---
+--- DMFT Ksum is finished  at Fri May 10 05:29:05 2019---
+--- Impurity solver is finished  at Fri May 10 05:38:19 2019---
+--- Running vaspCHG  at Fri May 10 05:38:19 2019---
+-------------- Running wannier 90 28----------------
+--- Starting Charge loop 29 at Fri May 10 05:48:36 2019---
+--- Starting DMFT loop 1 at Fri May 10 05:48:36 2019---
+--- DMFT Ksum is finished  at Fri May 10 05:50:23 2019---
+--- Impurity solver is finished  at Fri May 10 05:59:37 2019---
+--- Running vaspCHG  at Fri May 10 05:59:37 2019---
+-------------- Running wannier 90 29----------------
+--- Starting Charge loop 30 at Fri May 10 06:10:41 2019---
+--- Starting DMFT loop 1 at Fri May 10 06:10:41 2019---
+--- DMFT Ksum is finished  at Fri May 10 06:12:27 2019---
+--- Impurity solver is finished  at Fri May 10 06:21:41 2019---
+Caculation Ends at Fri May 10 06:21:41 2019

@@ -5,6 +5,7 @@ import subprocess
 import re,  time
 import os,sys,copy
 import Fileio
+import shutil
 #import generate_cix
 #import generate_5orb
 from time import gmtime, strftime
@@ -73,7 +74,7 @@ def Create_Trans(norb,nspin,at,cor_orbs,TB):
       print >>f, ''
  
 
-def RUN_CTQMC(p,pC,pD,it,itt,para_com,mu,ed,sig_st):
+def RUN_CTQMC(p,pC,pD,it,itt,para_com,mu,ed,vdc):
    U=p['U'];J=p['J'];cor_at=p['cor_at'];cor_orb=p['cor_orb']
    #mu=loadtxt('DMFT_mu.out')
    #ed=[]
@@ -98,9 +99,7 @@ def RUN_CTQMC(p,pC,pD,it,itt,para_com,mu,ed,sig_st):
             if os.path.exists('status'+str(i)+'.tar.gz'): 
                print os.popen('mv status'+str(i)+'.tar.gz '+dir_name).read()
 
-         cmd = 'cp Delta'+str(i+1)+'.inp '+dir_name
-         print os.popen(cmd).read() # copying Delta 
-
+         shutil.copy2('Delta'+str(i+1)+'.inp',dir_name+'Delta.inp')
 
          os.chdir(dir_name)
 
@@ -112,10 +111,10 @@ def RUN_CTQMC(p,pC,pD,it,itt,para_com,mu,ed,sig_st):
          if p['orbs'][i]=='f': pD['l=']=3
          elif p['orbs'][i]=='d': pD['l=']=2
          pD['J=']=float(J[i])
-         if p['nspin']==1:
-           pD['Eimp=']=array(ed[i])-ed[i][0]+array(sig_st[i])-sig_st[i][0]
-         else:
-           pD['Eimp=']=array(list(ed[i])+list(ed[i]))-ed[i][0]+array(list(sig_st[i])+list(sig_st[i]))-sig_st[i][0]
+         #if p['nspin']==1:
+         pD['Eimp=']=array(ed[i])-ed[i][0]#-array(vdc[i])+vdc[i][0]
+         #else:
+         #  pD['Eimp=']=array(list(ed[i])+list(ed[i]))-ed[i][0]#-array(list(vdc[i])+list(vdc[i]))+vdc[i][0]
          Create_atomd(pD)
          #IMP_SOLVER.Create_Trans(TB.ncor_orb_list[i],p['nspin'],ats[0],cor_orb[i],TB)
          #cmd = 'cp Trans'+str(i+1)+'.dat Trans.dat'
@@ -142,11 +141,12 @@ def RUN_CTQMC(p,pC,pD,it,itt,para_com,mu,ed,sig_st):
          #   print os.popen(cmd).read()
          #params_ctqmc['cix'][0]='impurity'+str(i+1)+'.cix'
 
-         pC['mu']=[float(mu-ed[i][0]-sig_st[i][0]), "# Chemical potential"] ### Impurity mu=mu_lattice-Ed
+         pC['mu']=[float(mu-ed[i][0]+vdc[i]), "# Chemical potential"] ### Impurity mu=mu_lattice-Ed
          pC['U']=[float(U[i]), "# Coulomb repulsion (F0)"]
          pC['J']=[float(J[i]), "# Hund's coupling"]
-         pC['cix'][0]='actqmc.cix'
-         pC['Delta'][0]='Delta'+str(i+1)+'.inp'
+         pC['cix']=['actqmc.cix', "# cix file"]
+         #pC['Delta'][0]='Delta'+str(i+1)+'.inp'
+         pC['Delta']=['Delta.inp', "# Delta file"]
          CreateInputFile(pC)
          #cmd = 'cp '+dir_name+'status.* .'
          #print os.popen(cmd).read()
@@ -160,26 +160,27 @@ def RUN_CTQMC(p,pC,pD,it,itt,para_com,mu,ed,sig_st):
 
 
          # Some copying to store data obtained so far (at each iteration)
-         cmd = 'cp Gf.out ../Gf'+str(i+1)+'.out'
-         print os.popen(cmd).read() # copying Gf
-         cmd = 'cp Gf.out Gf.out.'+str(itt)+'.'+str(it)
-         print os.popen(cmd).read() # copying Gf
-         cmd = 'cp Delta'+str(i+1)+'.inp Delta'+str(i+1)+'.inp.'+str(itt)+'.'+str(it)
-         print os.popen(cmd).read() # copying Gf
-         cmd = 'cp Sig.out ../Sig'+str(i+1)+'.out'
-         print os.popen(cmd).read() # copying Gf
-         cmd = 'cp Sig.out Sig.out.'+str(itt)+'.'+str(it)
-         print os.popen(cmd).read() # copying Gf
-         #cmd = 'cp Gtau.dat Gtau'+str(i+1)+'.dat'
+         #cmd = 'cp Gf.out ../Gf'+str(i+1)+'.out'
          #print os.popen(cmd).read() # copying Gf
-         cmd = 'cp ctqmc.log ctqmc.log.'+str(itt)+'.'+str(it)
-         print os.popen(cmd).read() # copying Gf
-         cmd = 'cp nohup.out nohup.out.'+str(itt)+'.'+str(it)
-         print os.popen(cmd).read() # copying Gf
-         cmd = 'cp Probability.dat Probability.dat.'+str(itt)+'.'+str(it)
-         print os.popen(cmd).read() # copying Gf
-         cmd = 'cp histogram.dat histogram.dat'+str(itt)+'.'+str(it)
-         print os.popen(cmd).read()
+         shutil.copy2('ctqmc.log','ctqmc.log.'+str(itt)+'.'+str(it))
+         shutil.copy2('Sig.out','Sig.out.'+str(itt)+'.'+str(it))
+         shutil.copy2('Gf.out','Gf.out.'+str(itt)+'.'+str(it))
+         #cmd = 'cp Gf.out Gf.out.'+str(itt)+'.'+str(it)
+         #print os.popen(cmd).read() # copying Gf
+         ##cmd = 'cp Delta'+str(i+1)+'.inp Delta'+str(i+1)+'.inp.'+str(itt)+'.'+str(it)
+         ##print os.popen(cmd).read() # copying Gf
+         #cmd = 'cp Sig.out ../Sig'+str(i+1)+'.out'
+         #print os.popen(cmd).read() # copying Gf
+         #cmd = 'cp Sig.out Sig.out.'+str(itt)+'.'+str(it)
+         #print os.popen(cmd).read() # copying Gf
+         ##cmd = 'cp Gtau.dat Gtau'+str(i+1)+'.dat'
+         ##print os.popen(cmd).read() # copying Gf
+         #cmd = 'cp nohup.out nohup.out.'+str(itt)+'.'+str(it)
+         #print os.popen(cmd).read() # copying Gf
+         #cmd = 'cp Probability.dat Probability.dat.'+str(itt)+'.'+str(it)
+         #print os.popen(cmd).read() # copying Gf
+         #cmd = 'cp histogram.dat histogram.dat.'+str(itt)+'.'+str(it)
+         #print os.popen(cmd).read()
 
          os.chdir('..')
 

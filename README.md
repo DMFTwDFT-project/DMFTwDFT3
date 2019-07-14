@@ -24,6 +24,8 @@ Aldo Romero <br />
 Kristjan Haule <br />
 Chris Marianetti <br />
 Uthpala Herath <br />
+Vijay Singh <br />
+Benny Wah <br />
 
 Support packages
 ----------------
@@ -40,6 +42,8 @@ Coming soon...
 Changes
 -------
 v1.0 July 31, 2018 - Initial release (Command line version)
+
+v2.0 July 10, 2019 - DMFTwDFT library version
 
 
 

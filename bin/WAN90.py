@@ -17,7 +17,6 @@ class WANNIER:
       self.num_kpts=int(line.split()[1]);self.num_bands=int(line.split()[0])
       self.eigvals=array(eigvals).reshape(self.num_kpts,self.num_bands)
       fi_eig.close()
-
    def load_chk(self,path):
       """ Load seedname.chk file and store """
       def list_to_complex(a): return complex(float(a[0]),float(a[1]))
@@ -141,7 +140,7 @@ class WANNIER:
 
 if __name__=='__main__':
    WAN=WANNIER('wannier90')
-   WAN.load_chk('/home/uthpala/Documents/Research/CondensedMatterResearch/projects/DFTDMFT/bin/')
+   WAN.load_chk('/home/uthpala/Documents/Research/projects/DMFTwDFT/bin/')
    WAN.load_eig()
    WAN.Check_Unitarity() 
    print WAN.ikpt
