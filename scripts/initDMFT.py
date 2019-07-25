@@ -54,7 +54,7 @@ else:
 
 #running wannier90.x to generate .chk
 print('Running wannier90...')
-cmd = para_com+" "+"wannier90.x wannier90"
+cmd = "wannier90.x wannier90"
 out, err = subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()
 if err:
 	print('wannier90 calculation failed!\n')
