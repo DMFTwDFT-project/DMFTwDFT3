@@ -46,7 +46,7 @@ else:
 	os.makedirs("dos")
 
 #copying the last few self-energies from the DMFT run in the directory above
-siglist = sorted(glob.glob("sig.inp.*"))[-siglistindx:]
+siglist = sorted(glob.glob("sig.inp.*"),key=os.path.getmtime)[-siglistindx:]
 for file in siglist:
 	shutil.copy(file,'./dos')
 
