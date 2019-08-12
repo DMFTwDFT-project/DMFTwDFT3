@@ -15,7 +15,9 @@ correlated materials (SCM) using beyond-DFT methods such as DFT+U, DFT+Hybrids a
 Installation and usage
 ----------------------
 
-Please refer to the documentation. 
+Please refer to the documentation.
+
+https://romerogroup.github.io/DMFTwDFT/ 
 
 Contributors
 ------------
