@@ -1,6 +1,6 @@
 *.pyc
 .DS_Store
-./run_examples/*
+examples
 
 #sphinx
 _build/
