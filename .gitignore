@@ -3,6 +3,7 @@
 examples/
 *.so
 ctqmc
+skrams
 
 #sphinx
 _build/
