@@ -3,7 +3,7 @@ import os, time, subprocess
 if __name__=='__main__':
    trigger='Degree'
    trig1='band No.'
-   bands=str(raw_input("Enter how many bands?:"))
+   bands=int(raw_input("Enter how many bands?:"))
    flag = -1
    begin=10**10
    kpt=1
