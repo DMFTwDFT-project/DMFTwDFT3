@@ -14,8 +14,11 @@ with open('G_loc.out', 'r') as f:
     y_dyz = [float(line.split()[6]) for line in lines]  #t2g
     y_dxy = [float(line.split()[10]) for line in lines]
 
-y_eg =[-1*sum(x)/3.14 for x in zip(y_dz2, y_x2y2)]   
-y_t2g =[-1*sum(x)/3.14 for x in zip(y_dxz, y_dyz,y_dxy)]    
+    yg= [float(line.split()[2])+float(line.split()[8]) for line in lines]
+    tg= [float(line.split()[4])+float(line.split()[6])+float(line.split()[10]) for line in lines]
+
+y_eg =[-1*count/3.14 for count in yg]
+y_t2g =[-1*count/3.14 for count in tg]  
     
 plt.figure(1)
 plt.plot(x,y_eg,'r',label='$d-e_g$') 
