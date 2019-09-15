@@ -113,6 +113,13 @@ for i in range(len(Sig)):
   SigSpline = interpolate.splrep(om, Sig[i].imag, k=1, s=0)
   Sig_tot[i,:] += 1j*interpolate.splev(ommesh, SigSpline)
 
+fo=open('SigMdc.out','w')
+for i in range(5):
+   if i==0 or i==3:
+      fo.write(%18.15f ' %(s_oo_Vdc[0]))
+   else:
+      fo.write(%18.15f ' %(s_oo_Vdc[1]))
+	
 header1='# nom,ncor_orb= '+str(len(ommesh))+' '+str(len(Sig_tot))
 #header2='# T= %18.15f'%(1.0/pC['beta'][0])#+str(self.T)
 header2='# T= %18.15f'%(broaden)#+str(self.T)
