@@ -112,12 +112,7 @@ def RUN_CTQMC(p,pC,pD,it,itt,para_com,mu,ed,vdc):
          elif p['orbs'][i]=='d': pD['l=']=2
          pD['J=']=float(J[i])
          #if p['nspin']==1:
-         #pD['Eimp=']=array(ed[i])-ed[i][0] #-array(vdc[i])+vdc[i][0]
-	 print('ed[',i,']=',ed[i])
-    
-	 pD['Eimp=']=array(ed[i])-ed[i][0] - array([0,100.0]) #array([1,2]) since the length of correlated orbitals is two
-
-	 print('Eimp = ',pD['Eimp='])
+         pD['Eimp=']=array(ed[i])-ed[i][0]#-array(vdc[i])+vdc[i][0]
          #else:
          #  pD['Eimp=']=array(list(ed[i])+list(ed[i]))-ed[i][0]#-array(list(vdc[i])+list(vdc[i]))+vdc[i][0]
          Create_atomd(pD)
