@@ -116,10 +116,16 @@ for i in range(len(Sig)):
 fo=open('SigMdc.out','w')
 for i in range(5):
    if i==0 or i==3:
-      fo.write(%18.15f ' %(s_oo_Vdc[0]))
+      fo.write('%18.15f ' %(s_oo_Vdc[0]))
    else:
-      fo.write(%18.15f ' %(s_oo_Vdc[1]))
-	
+      fo.write('%18.15f ' %(s_oo_Vdc[1]))
+if len(s_oo_Vdc)>5:
+   fum=open('SigMdc_dn.out','w')
+   for j in range(5):
+      if j ==0 or j==3:
+         fum.write('%18.15f ' %(s_oo_Vdc[2]))
+      else:
+         fum.write('%18.15f ' %(s_oo_Vdc[3]))
 header1='# nom,ncor_orb= '+str(len(ommesh))+' '+str(len(Sig_tot))
 #header2='# T= %18.15f'%(1.0/pC['beta'][0])#+str(self.T)
 header2='# T= %18.15f'%(broaden)#+str(self.T)
