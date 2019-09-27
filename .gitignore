@@ -1,7 +1,7 @@
-.pyc
+*.pyc
 .DS_Store
 examples/
-.so
+*.so
 ctqmc
 skrams
 
