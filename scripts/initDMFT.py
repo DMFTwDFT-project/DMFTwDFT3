@@ -31,7 +31,8 @@ TB=Struct.TBstructure('POSCAR',p['atomnames'],p['orbs'])
 TB.Compute_cor_idx(p['cor_at'],p['cor_orb'])
 print(TB.TB_orbs)
 DFT=VASP.VASP_class()
-DFT.NBANDS=pV['NBANDS='][0]
+if pV.keys().count('NBANDS='):
+	DFT.NBANDS = pV['NBANDS='][0]
 DFT.Create_win(TB,p['atomnames'],p['orbs'],p['L_rot'],DFT.NBANDS,DFT.EFERMI+p['ewin'][0],DFT.EFERMI+p['ewin'][1])
 
 #initial DFT run
@@ -49,8 +50,11 @@ else:
 	f = open('dft.out','w')
 	f.write(out)
 	f.close()
-	
 
+#Updating wannier90.win with the number of DFT bands
+DFT.Read_NBANDS()
+DFT.Read_EFERMI()
+DFT.Update_win(DFT.NBANDS,DFT.EFERMI+p['ewin'][0],DFT.EFERMI+p['ewin'][1])
 
 #running wannier90.x to generate .chk
 print('Running wannier90...')
