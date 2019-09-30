@@ -4,6 +4,7 @@ examples/
 *.so
 ctqmc
 skrams
+vaspDMFT
 
 #sphinx
 _build/
