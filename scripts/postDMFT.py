@@ -291,8 +291,8 @@ class PostProcess:
 
 		#creating directory for bands
 		if os.path.exists("bands"):
-			shutil.rmtree("band")
-			os.makedirs("band")
+			shutil.rmtree("bands")
+			os.makedirs("bands")
 		else:	
 			os.makedirs("bands")
 
@@ -502,9 +502,9 @@ if __name__ == "__main__":
 
 	#parser for dos
 	parser_dos = subparsers.add_parser('dos',help = 'DMFT Density of States')
-	parser_dos.add_argument('-emin',default=-7.0, type=float, help='Minimum value for interpolation')
-	parser_dos.add_argument('-emax',default=3.0, type=float, help='Maximum value for interpolation')
-	parser_dos.add_argument('-rom',default=3000, type=float, help='Matsubara Frequency (omega) points')
+	parser_dos.add_argument('-emin',default=-5.0, type=float, help='Minimum value for interpolation')
+	parser_dos.add_argument('-emax',default=5.0, type=float, help='Maximum value for interpolation')
+	parser_dos.add_argument('-rom',default=1000, type=int, help='Matsubara Frequency (omega) points')
 	parser_dos.add_argument('-broaden',default=0.03, type=float, help='Broadening')
 	parser_dos.add_argument('-plot',action='store_true', help='Plot the density of states?')
 	parser_dos.set_defaults(func=PostProcess().dos)
@@ -515,11 +515,10 @@ if __name__ == "__main__":
 	parser_bands.add_argument('-emax',default=5.0, type=float, help='Maximum value for interpolation')
 	parser_bands.add_argument('-rom',default=1000, type=float, help='Matsubara Frequency (omega) points')
 	parser_bands.add_argument('-sp',action='store_true', help='Spin polarized calculation?')
-	parser_bands.add_argument('-kpband',default=1000,type=int,help='Number of k-points for band structure calculation')
+	parser_bands.add_argument('-kpband',default=3500,type=int,help='Number of k-points for band structure calculation')
 	parser_bands.add_argument('-knames',default=['$\Gamma$','X','M','$\Gamma$','R'],type=str,nargs='+',help='Names of the k-points')
 	parser_bands.add_argument('-kplist',default=[[0,0,0],[0.5,0,0],[0.5,0.5,0],[0,0,0],[0.5,0.5,0.5]],type=int,nargs='+',action='append',help='List of k-points as an array')
 	parser_bands.set_defaults(func=PostProcess().bands)
-
 
 	args = parser.parse_args()
 	args.func(args)
