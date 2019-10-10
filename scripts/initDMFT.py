@@ -210,6 +210,6 @@ if __name__ == "__main__":
 	#parser for dft  
 	parser.add_argument('-dft',default='vasp', type=str, help='Choice of DFT code for the DMFT calculation. Currently available: \n [vasp,siesta]')
 	parser.add_argument('-dftexec',default='vasp_std', type=str, help='The name of the chosed dft executable. \n E.g. vasp_std ')
-	parser.add_argument('-relax',action='store_true', help='Flag to check for convergence. Program exists if not converged.')
+	parser.add_argument('-relax',action='store_true', help='Flag to check for convergence. Program exits if not converged.')
 	args = parser.parse_args()
 	Initialize(args)
