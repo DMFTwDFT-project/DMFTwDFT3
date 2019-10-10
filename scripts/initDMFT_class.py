@@ -1,9 +1,9 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 import sys, subprocess, os
 import numpy as np
 import shutil
 from shutil import copyfile
-import VASP
+import VASP3
 import Struct
 from INPUT import *
 import argparse
@@ -35,7 +35,7 @@ class Initialize():
 			self.vasp_exec = args.dftexec
 
 			#import the VASP class
-			self.DFT=VASP.VASP_class()
+			self.DFT=VASP3.VASP_class()
 
 		
 		self.gen_win()	
@@ -53,8 +53,8 @@ class Initialize():
 		#generating wannier90.win
 		TB=Struct.TBstructure('POSCAR',p['atomnames'],p['orbs'])
 		TB.Compute_cor_idx(p['cor_at'],p['cor_orb'])
-		print(TB.TB_orbs)
-		if pV.keys().count('NBANDS='):
+		print((TB.TB_orbs))
+		if list(pV.keys()).count('NBANDS='):
 			self.DFT.NBANDS = pV['NBANDS='][0]
 		self.DFT.Create_win(TB,p['atomnames'],p['orbs'],p['L_rot'],self.DFT.NBANDS,self.DFT.EFERMI+p['ewin'][0],self.DFT.EFERMI+p['ewin'][1])
 
@@ -69,13 +69,13 @@ class Initialize():
 		out, err = subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()
 		if err:
 			print('DFT calculation failed! Check dft.error for details.\n')
-			f = open('dft.error','w')
+			f = open('dft.error','wb')
 			f.write(err)
 			f.close()
 			sys.exit()
 		else:
 			print('DFT calculation complete.\n')	
-			f = open('dft.out','w')
+			f = open('dft.out','wb')
 			f.write(out)
 			f.close()
 
@@ -140,7 +140,7 @@ class Initialize():
 		copyfile("INPUT.py","./DMFT/INPUT.py")
 
 		#copying files into DMFT directory
-		cmd = "cd ./DMFT && Copy_input.py ../"
+		cmd = "cd ./DMFT && Copy_input_bands.py ../"
 		out, err = subprocess.Popen(cmd, shell=True).communicate()
 		if err:
 			print('File copy failed!\n')

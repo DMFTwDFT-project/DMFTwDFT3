@@ -1,3 +1,4 @@
+#!/usr/bin/env python2
 from scipy import *
 import os,subprocess
 from mysub import *

@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 from scipy import *
 import os,sys,copy
 
@@ -26,9 +26,9 @@ class TBstructure:
          else: linenum+=1
          lines.append(line)
       self.atomname=[]
-      if str(line1.split()[0])[0]=='D' or str(line1.split()[0])[0]=='C' or str(line1.split()[0])[0]=='d' or str(line1.split()[0])[0]=='c': print("INPUT atom name info in POSCAR!!"); exit() #self.specpoint=array([int(s) for s in line0.split()]); linenum+=1
+      if str(line1.split()[0])[0]=='D' or str(line1.split()[0])[0]=='C' or str(line1.split()[0])[0]=='d' or str(line1.split()[0])[0]=='c': print "INPUT atom name info in POSCAR!!"; exit() #self.specpoint=array([int(s) for s in line0.split()]); linenum+=1
       elif str(line2.split()[0])[0]=='D' or str(line2.split()[0])[0]=='C' or str(line2.split()[0])[0]=='d' or str(line2.split()[0])[0]=='c': self.specpoint=array([int(s) for s in line1.split()]);self.atomname=[s for s in line0.split()]
-      if linenum<sum(self.specpoint): print("Number of atoms for poscar is not right!"); exit()
+      if linenum<sum(self.specpoint): print "Number of atoms for poscar is not right!"; exit()
       self.nspecies=len(self.specpoint)
       #if self.nspecies!=len(atomnames): print "Number of atoms for poscar and for INPUT.py is not consistent!"; exit()
       self.coord=line2.strip().lower()[0]
@@ -36,7 +36,7 @@ class TBstructure:
       for i in range(sum(self.specpoint)): self.at[i]=array([float(s) for s in lines[i+3].split()[:3]])
       if self.coord=='c':self.atc=self.at*self.scale; self.atd=dot(self.atc,inv(self.vec)) ; self.at=self.atc
       elif self.coord=='d':self.atd=self.at; self.atc=dot(self.atd,self.vec)
-      else: print("ERROR: coordinates must be direct or cartesian");sys.exit()
+      else: print "ERROR: coordinates must be direct or cartesian";sys.exit()
       self.scale=1.0 # the vec and atc were rescaled above... set scale to 1...
       #print self.atc;exit()
 
@@ -59,8 +59,8 @@ class TBstructure:
                   idxidx+=1
                chkpoint=1
             else: idxidx+=nspec
-         if chkpoint==0: print("Couldn't find the atom name", atname, "in POSCAR"); exit()
-      self.natoms=len(list(self.TB_orbs.keys()))
+         if chkpoint==0: print "Couldn't find the atom name", atname, "in POSCAR"; exit()
+      self.natoms=len(self.TB_orbs.keys())
       #print self.at_idx; exit()
       #print "atomic names=", self.names
       
@@ -92,21 +92,21 @@ class TBstructure:
          else: linenum+=1
          lines.append(line)
       self.atomname=[]
-      if str(line1.split()[0])[0]=='D' or str(line1.split()[0])[0]=='C' or str(line1.split()[0])[0]=='d' or str(line1.split()[0])[0]=='c': print("INPUT atom name info in POSCAR!!"); exit() #self.specpoint=array([int(s) for s in line0.split()]); linenum+=1
+      if str(line1.split()[0])[0]=='D' or str(line1.split()[0])[0]=='C' or str(line1.split()[0])[0]=='d' or str(line1.split()[0])[0]=='c': print "INPUT atom name info in POSCAR!!"; exit() #self.specpoint=array([int(s) for s in line0.split()]); linenum+=1
       elif str(line2.split()[0])[0]=='D' or str(line2.split()[0])[0]=='C' or str(line2.split()[0])[0]=='d' or str(line2.split()[0])[0]=='c': self.specpoint=array([int(s) for s in line1.split()]);self.atomname=[s for s in line0.split()]
-      if linenum<sum(self.specpoint): print("Number of atoms for poscar is not right!"); exit()
+      if linenum<sum(self.specpoint): print "Number of atoms for poscar is not right!"; exit()
       self.nspecies=len(self.specpoint)
       self.coord=line2.strip().lower()[0]
       self.at=zeros((sum(self.specpoint),3),float)
       for i in range(sum(self.specpoint)): self.at[i]=array([float(s) for s in lines[i+3].split()[:3]])
       if self.coord=='c':self.atc=self.at*self.scale; self.atd=dot(self.atc,inv(self.vec)) ; self.at=self.atc
       elif self.coord=='d':self.atd=self.at; self.atc=dot(self.atd,self.vec)
-      else: print("ERROR: coordinates must be direct or cartesian");sys.exit()
+      else: print "ERROR: coordinates must be direct or cartesian";sys.exit()
       self.scale=1.0 # the vec and atc were rescaled above... set scale to 1...
 
 
    def Compute_cor_idx(self,cor_at,cor_orb):
-      if len(cor_at)!=len(cor_orb): print("The number of cor_at should be same as the number of cor_orb"); exit()
+      if len(cor_at)!=len(cor_orb): print "The number of cor_at should be same as the number of cor_orb"; exit()
       self.ncor_orb=0;self.ncor_orb_list=[];self.max_cor_orb=0
       cor_at_flat=[item for sublist in cor_at for item in sublist]
       for at in cor_at_flat: self.ncor_orb+=len(self.TB_orbs[at]); self.max_cor_orb=max(self.max_cor_orb,len(self.TB_orbs[at]))
@@ -131,20 +131,20 @@ class TBstructure:
             for orb in self.TB_orbs[at]:
                idx=self.idx[at][orb]
                if self.orb_idx['s'].count(orb)==1 or self.orb_idx['p'].count(orb)==1 :
-                  print(at," atom ",orb," orbital is treated by LDA!")
+                  print at," atom ",orb," orbital is treated by LDA!"
                   self.cor_idx[idx]=0
                elif cor_orb_flat[i].count(orb)==0 and (self.orb_idx['d'].count(orb)==1 or self.orb_idx['f'].count(orb)==1):
-                  if rank==0: print(at," atom ",orb," orbital is treated by HF!")
+                  if rank==0: print at," atom ",orb," orbital is treated by HF!"
                   self.cor_idx[idx]=1
                   self.LHF='.TRUE.'
                   #Nd_at+=dm[idx]
                elif cor_orb_flat[i].count(orb)==1 and (self.orb_idx['d'].count(orb)==1 or self.orb_idx['f'].count(orb)==1):
-                  if rank==0: print(at," atom ",orb," orbital is treated by DMFT!")
+                  if rank==0: print at," atom ",orb," orbital is treated by DMFT!"
                   for j,cor in enumerate(cor_orb[i]):
                     if cor.count(orb):
                        self.cor_idx[idx]=2+idx1+j; break
                   #Nd_at+=dm[idx]
-               else: print(at," atom ",orb," orbital is not supported!"); exit()
+               else: print at," atom ",orb," orbital is not supported!"; exit()
          idx1+=len(cor_orb[i])
          #Nd_atom.append(Nd_at/len(ats))
 

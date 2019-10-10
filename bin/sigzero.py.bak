@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 # @Copyright 2007 Kristjan Haule
 import sys,re,os,shutil
 import optparse, subprocess
@@ -6,7 +6,7 @@ from scipy import *
 from scipy import optimize
 import numpy
 
-nv = list(map(int,numpy.__version__.split('.')))
+nv = map(int,numpy.__version__.split('.'))
 if (nv[0],nv[1]) < (1,6):
     loadtxt = io.read_array
     #
@@ -64,7 +64,7 @@ if __name__=='__main__':
     """
     # n==(200/T-1)/2.
     if os.path.exists('INPUT.py'): 
-       exec(compile(open('INPUT.py', "rb").read(), 'INPUT.py', 'exec'))
+       execfile('INPUT.py')
        nc=0
        for i,ats in enumerate(p['cor_at']):
           for j,orbs in enumerate(p['cor_orb'][i]):
@@ -176,12 +176,12 @@ if __name__=='__main__':
     omega = (arange(1,options.nom,1)*2-1)*pi*options.T
     # writing to the file
     fo = open(options.outsig, 'w')
-    print('# nom,ncor_orb=', options.nom-1, options.Nc, file=fo)
-    print('# T=', (options.T), file=fo)
-    print('# s_oo-Vdc=', ("0.0 "*(options.Nc)), file=fo)
-    print('# s_oo=', (ones(options.Nc)*options.Edc).tolist(), file=fo)
-    print('# Vdc=', (ones(options.Nc)*options.Edc).tolist(), file=fo)
+    print >> fo, '# nom,ncor_orb=', options.nom-1, options.Nc
+    print >> fo, '# T=', (options.T)
+    print >> fo, '# s_oo-Vdc=', ("0.0 "*(options.Nc))
+    print >> fo, '# s_oo=', (ones(options.Nc)*options.Edc).tolist()
+    print >> fo, '# Vdc=', (ones(options.Nc)*options.Edc).tolist()
     for iom,om in enumerate(omega):
-        print(("%20.15f "%om), ("0.0 "*(2*options.Nc)), file=fo)
+        print >> fo, ("%20.15f "%om), ("0.0 "*(2*options.Nc))
         
-    print((options.outsig,'written to the disc.'))
+    print(options.outsig,'written to the disc.')

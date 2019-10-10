@@ -1,3 +1,4 @@
+#!/usr/bin/env python2
 from scipy import *
 from scipy import linalg
 from mysub import *
