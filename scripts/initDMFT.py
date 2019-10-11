@@ -88,14 +88,14 @@ class Initialize():
 		out, err = subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()
 		if err:
 			print('DFT calculation failed! Check dft.error for details.\n')
-			errdir = dir + 'dft.error'
+			errdir = dir+os.sep+'dft.error'
 			f = open(errdir,'wb')
 			f.write(err)
 			f.close()
 			sys.exit()
 		else:
 			print('DFT calculation complete.\n')	
-			outdir = dir +'dft.out'
+			outdir = dir+os.sep+'dft.out'
 			f = open(outdir,'wb')
 			f.write(out)
 			f.close()
