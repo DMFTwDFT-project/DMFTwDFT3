@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 from scipy import *
 import os,sys,copy
 
@@ -168,7 +168,7 @@ class TBstructure:
       comp.sort()
       n3=array(comp[-1][1:])/comp[-1][0]
       del comp[-1]
-      comp.sort(cmp_list2)
+      comp.sort(key=comp_sort,reverse=True)
       for cp in comp:
          n1=array(cp[1:])/cp[0]
          if abs(dot(n3,n1))<0.1: break
@@ -193,3 +193,7 @@ def cmp_list(x,y,idx=3):
 
 def cmp_list2(x,y,idx=1):
    return cmp(abs(x[idx]),abs(y[idx]))
+
+#included for python 3 support by Uthpala to mimic cmp_list2
+def comp_sort(t):
+   return t[1]   

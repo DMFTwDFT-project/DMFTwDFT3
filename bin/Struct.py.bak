@@ -26,7 +26,7 @@ class TBstructure:
          else: linenum+=1
          lines.append(line)
       self.atomname=[]
-      if str(line1.split()[0])[0]=='D' or str(line1.split()[0])[0]=='C' or str(line1.split()[0])[0]=='d' or str(line1.split()[0])[0]=='c': print "INPUT atom name info in POSCAR!!"; exit() #self.specpoint=array([int(s) for s in line0.split()]); linenum+=1
+      if str(line1.split()[0])[0]=='D' or str(line1.split()[0])[0]=='C' or str(line1.split()[0])[0]=='d' or str(line1.split()[0])[0]=='c': print("INPUT atom name info in POSCAR!!"); exit() #self.specpoint=array([int(s) for s in line0.split()]); linenum+=1
       elif str(line2.split()[0])[0]=='D' or str(line2.split()[0])[0]=='C' or str(line2.split()[0])[0]=='d' or str(line2.split()[0])[0]=='c': self.specpoint=array([int(s) for s in line1.split()]);self.atomname=[s for s in line0.split()]
       if linenum<sum(self.specpoint): print "Number of atoms for poscar is not right!"; exit()
       self.nspecies=len(self.specpoint)
@@ -92,7 +92,7 @@ class TBstructure:
          else: linenum+=1
          lines.append(line)
       self.atomname=[]
-      if str(line1.split()[0])[0]=='D' or str(line1.split()[0])[0]=='C' or str(line1.split()[0])[0]=='d' or str(line1.split()[0])[0]=='c': print "INPUT atom name info in POSCAR!!"; exit() #self.specpoint=array([int(s) for s in line0.split()]); linenum+=1
+      if str(line1.split()[0])[0]=='D' or str(line1.split()[0])[0]=='C' or str(line1.split()[0])[0]=='d' or str(line1.split()[0])[0]=='c': print("INPUT atom name info in POSCAR!!"); exit() #self.specpoint=array([int(s) for s in line0.split()]); linenum+=1
       elif str(line2.split()[0])[0]=='D' or str(line2.split()[0])[0]=='C' or str(line2.split()[0])[0]=='d' or str(line2.split()[0])[0]=='c': self.specpoint=array([int(s) for s in line1.split()]);self.atomname=[s for s in line0.split()]
       if linenum<sum(self.specpoint): print "Number of atoms for poscar is not right!"; exit()
       self.nspecies=len(self.specpoint)
