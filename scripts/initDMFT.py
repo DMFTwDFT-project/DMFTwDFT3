@@ -29,6 +29,11 @@ class Initialize():
 	python initDMFT.py
 	cd DMFT
 	RUNDMFT.py 
+	
+
+	if the -relax flag is used then the program will check if convergence is reached and rerun
+	if necessary. Remember to put an updated version of the DFT inputs for higher convergence 
+	inside DFT_relax.
 
 	"""
 
@@ -118,12 +123,23 @@ class Initialize():
 					copyfile('./DFT_relax/CONTCAR','./POSCAR')
 
 				else:	
-					print('Convergence not reached. Recalculate with higher convergence parameters.')
-					sys.exit()
-
+					print('Convergence not reached. Recalculating with higher convergence parameters.')
+					self.vasp_run('./DFT_relax')	
+					vasprun = vasp.Vasprun('./DFT_relax/vasprun.xml')
+					if vasprun.converged_ionic == True:
+						print('Ionic convergence reached. Copying CONTCAR to root directory.')
+						copyfile('./DFT_relax/CONTCAR','./POSCAR')
+					else:
+						print('Convergence not reached. Update convergence parameters.')
 			else:
-				print('DFT_relax directory exists but vasprun.xml does not.')	
-				sys.exit()
+				print('DFT_relax directory exists but vasprun.xml does not. Running VASP now.')	
+				self.vasp_run('./DFT_relax')
+				vasprun = vasp.Vasprun('./DFT_relax/vasprun.xml')	
+				if vasprun.converged_ionic == True:
+					print('Ionic convergence reached. Copying CONTCAR to root directory.')
+					copyfile('./DFT_relax/CONTCAR','./POSCAR')
+				else:
+					print('Convergence not reached. Update convergence parameters.')
 		else:
 			print('DFT_relax directory does not exist.')
 			sys.exit()
