@@ -72,6 +72,8 @@ class Initialize():
 		"""
 		This method generates wannier90.win for initial DFT run.
 		"""
+		#wannier mesh tolerance 
+		kmesh_tol = 0.000001
 
 		#generating wannier90.win
 		TB=Struct.TBstructure('POSCAR',p['atomnames'],p['orbs'])
@@ -79,7 +81,7 @@ class Initialize():
 		print((TB.TB_orbs))
 		if list(pV.keys()).count('NBANDS='):
 			self.DFT.NBANDS = pV['NBANDS='][0]
-		self.DFT.Create_win(TB,p['atomnames'],p['orbs'],p['L_rot'],self.DFT.NBANDS,self.DFT.EFERMI+p['ewin'][0],self.DFT.EFERMI+p['ewin'][1])
+		self.DFT.Create_win(TB,p['atomnames'],p['orbs'],p['L_rot'],self.DFT.NBANDS,self.DFT.EFERMI+p['ewin'][0],self.DFT.EFERMI+p['ewin'][1],kmesh_tol)
 
 	def vasp_run(self,dir):
 		"""
