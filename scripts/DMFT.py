@@ -195,7 +195,7 @@ class Initialize():
 
 		#creating directory for DMFT
 		if os.path.exists("DMFT"):
-			#shutil.rmtree("DMFT")
+			shutil.rmtree("DMFT/imp.0/")
 			#os.makedirs("DMFT")
 			pass
 		else:	
