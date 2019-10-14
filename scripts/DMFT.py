@@ -132,6 +132,7 @@ class Initialize():
 						copyfile('./DFT_relax/CONTCAR','./POSCAR')
 					else:
 						print('Convergence not reached. Update convergence parameters.')
+						sys.exit()
 			else:
 				print('DFT_relax directory exists but vasprun.xml does not. Running VASP now.')	
 				self.vasp_run('./DFT_relax')
@@ -141,6 +142,7 @@ class Initialize():
 					copyfile('./DFT_relax/CONTCAR','./POSCAR')
 				else:
 					print('Convergence not reached. Update convergence parameters.')
+					sys.exit()
 		else:
 			print('DFT_relax directory does not exist.')
 			sys.exit()
