@@ -117,31 +117,58 @@ class Initialize():
 		#First check if  converged	
 		if os.path.exists('./DFT_relax'):
 			if os.path.exists('./DFT_relax/vasprun.xml'):
-				vasprun = vasp.Vasprun('./DFT_relax/vasprun.xml')
-
-				if vasprun.converged_ionic == True:
-					print('Ionic convergence reached. Copying CONTCAR to root directory.')
-					copyfile('./DFT_relax/CONTCAR','./POSCAR')
-
-				else:	
-					print('Convergence not reached. Recalculating with higher convergence parameters.')
-					self.vasp_run('./DFT_relax')	
+				try:
 					vasprun = vasp.Vasprun('./DFT_relax/vasprun.xml')
+
+					if vasprun.converged_ionic == True:
+						print('Ionic convergence reached. Copying CONTCAR to root directory.')
+						copyfile('./DFT_relax/CONTCAR','./POSCAR')
+
+					else:	
+						print('Convergence not reached. Recalculating with higher convergence parameters.')
+						self.vasp_run('./DFT_relax')	
+
+						try:
+							vasprun = vasp.Vasprun('./DFT_relax/vasprun.xml')
+							if vasprun.converged_ionic == True:
+								print('Ionic convergence reached. Copying CONTCAR to root directory.')
+								copyfile('./DFT_relax/CONTCAR','./POSCAR')
+							else:
+								print('Convergence not reached. Update convergence parameters.')
+								sys.exit()
+						except:
+							print('vasprun.xml is incomplete. This is a result of an incomplete VASP calculation.')	
+							sys.exit()
+				except:
+					print('vasprun.xml is incomplete. This is a result of an incomplete VASP calculation.')		
+					print('Restarting VASP calculation...')	
+					self.vasp_run('./DFT_relax')
+					try:
+						vasprun = vasp.Vasprun('./DFT_relax/vasprun.xml')	
+						if vasprun.converged_ionic == True:
+							print('Ionic convergence reached. Copying CONTCAR to root directory.')
+							copyfile('./DFT_relax/CONTCAR','./POSCAR')
+						else:
+							print('Convergence not reached. Update convergence parameters.')
+							sys.exit()
+					except:
+						print('vasprun.xml is incomplete. This is a result of an incomplete VASP calculation.')		
+						sys.exit()
+			else:
+				print('DFT_relax directory exists but vasprun.xml does not. Running VASP now.')	
+				self.vasp_run('./DFT_relax')
+
+
+				try:
+					vasprun = vasp.Vasprun('./DFT_relax/vasprun.xml')	
 					if vasprun.converged_ionic == True:
 						print('Ionic convergence reached. Copying CONTCAR to root directory.')
 						copyfile('./DFT_relax/CONTCAR','./POSCAR')
 					else:
 						print('Convergence not reached. Update convergence parameters.')
 						sys.exit()
-			else:
-				print('DFT_relax directory exists but vasprun.xml does not. Running VASP now.')	
-				self.vasp_run('./DFT_relax')
-				vasprun = vasp.Vasprun('./DFT_relax/vasprun.xml')	
-				if vasprun.converged_ionic == True:
-					print('Ionic convergence reached. Copying CONTCAR to root directory.')
-					copyfile('./DFT_relax/CONTCAR','./POSCAR')
-				else:
-					print('Convergence not reached. Update convergence parameters.')
+				except:
+					print('vasprun.xml is incomplete. This is a result of an incomplete VASP calculation.')		
 					sys.exit()
 		else:
 			print('DFT_relax directory does not exist.')
