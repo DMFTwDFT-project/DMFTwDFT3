@@ -66,7 +66,10 @@ class Initialize():
 			self.vasp_convergence()
 		
 		if args.dmft:
-			self.run_dmft(args.fdmft)
+			self.run_dmft(args.force)
+
+		if args.hf:
+			self.run_hf(args.force)
 
 	def gen_win(self):
 		"""
@@ -226,8 +229,9 @@ class Initialize():
 
 		#creating directory for DMFT
 		if os.path.exists("DMFT"):
-			shutil.rmtree("DMFT/imp.0/")
-			#os.makedirs("DMFT")
+			if os.path.exists("DMFT/imp.0/"):
+				shutil.rmtree("DMFT/imp.0/")
+				#os.makedirs("DMFT")
 		else:	
 			os.makedirs("DMFT")
 
@@ -243,9 +247,38 @@ class Initialize():
 			sys.exit()
 		else:
 			print(out)
-		print('\nDMFT initialization complete. Ready to run RUNDMFT.py.\n')
+		print('\nDMFT initialization complete. Ready to run DMFT calculation.\n')
 
-	def run_dmft(self,fdmft):
+	def copy_files_hf(self):	
+		"""
+		This creates a directory HF in the root directory 
+		and copies all the necessary files.
+		"""	
+
+		#creating directory for HF 
+		if os.path.exists("HF"):
+			if os.path.exists("HF/imp.0/"):
+				shutil.rmtree("HF/imp.0/")
+				#os.makedirs("DMFT")
+		else:	
+			os.makedirs("HF")
+
+		#copy INPUT.py to DMFT directory
+		copyfile("INPUT.py","./HF/INPUT.py")
+
+		#copying files into DMFT directory
+		cmd = "cd ./HF && Copy_input_bands.py ../"
+		out, err = subprocess.Popen(cmd, shell=True).communicate()
+		if err:
+			print('File copy failed!\n')
+			print(err)
+			sys.exit()
+		else:
+			print(out)
+		print('\nHF initialization complete. Ready to run HF calculation.\n')
+
+
+	def run_dmft(self,force):
 		"""
 		This first checks if there is a previous DMFT calculation and runs
 		DMFT only if that run is incomplete unless forced.
@@ -261,9 +294,9 @@ class Initialize():
 
 			if done_word.split()[0] == 'Calculation':
 				print('Existing DMFT calculation is complete.')
-				if fdmft:
+				if force:
 					#forcing DMFT calculation	
-					print('-fdmft flag enabled. Restarting DMFT...')
+					print('-force flag enabled. Restarting DMFT...')
 					self.vasp_run(self.dir)
 					self.update_win()
 					self.run_wan90()
@@ -287,7 +320,7 @@ class Initialize():
 
 				else:
 					#exit when exiting DMFT calculation is complete.
-					print('-fdmft flag disabled. Exiting. ')
+					print('-force flag disabled. Exiting. ')
 					sys.exit()
 
 
@@ -338,6 +371,99 @@ class Initialize():
 				f.write(out)
 				f.close()
 
+	def run_hf(self,force):
+		"""
+		This first checks if there is a previous HF calculation and runs
+		HF only if that run is incomplete unless forced.
+		"""
+
+		#Checking for previous HF run in the directory
+		pathstr ='./HF'+os.sep+'INFO_TIME'
+
+		if os.path.exists(pathstr):
+			fi=open(pathstr,'r')
+			done_word=fi.readlines()[-1]
+			fi.close()
+
+			if done_word.split()[0] == 'Calculation':
+				print('Existing HF calculation is complete.')
+				if force:
+					#forcing HF calculation	
+					print('-force flag enabled. Restarting HF...')
+					self.vasp_run(self.dir)
+					self.update_win()
+					self.run_wan90()
+					self.copy_files_hf()
+					print('Running HF...')
+					cmd = 'cd '+'HF'+ ' && '+ 'RUNDMFT_HF.py' #+ " > dft.out 2> dft.error"
+					out, err = subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()
+					if err:
+						print('HF calculation failed! Check hf.error for details.\n')
+						errdir = './HF'+os.sep+'hf.error'
+						f = open(errdir,'wb')
+						f.write(err)
+						f.close()
+						sys.exit()
+					else:
+						print('HF calculation complete.\n')	
+						outdir ='./HF'+os.sep+'hf.out'
+						f = open(outdir,'wb')
+						f.write(out)
+						f.close()
+
+				else:
+					#exit when exiting HF calculation is complete.
+					print('-force flag disabled. Exiting. ')
+					sys.exit()
+
+
+			else:
+				#Incomplete HF calculation.
+				print('HF calculation incomplete.')
+				self.vasp_run(self.dir)
+				self.update_win()
+				self.run_wan90()
+				self.copy_files_hf()
+				print('Running HF...')
+				cmd = 'cd '+'HF'+ ' && '+ 'RUNDMFT_HF.py' #+ " > dft.out 2> dft.error"
+				out, err = subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()
+				if err:
+					print('HF calculation failed! Check hf.error for details.\n')
+					errdir = './HF'+os.sep+'hf.error'
+					f = open(errdir,'wb')
+					f.write(err)
+					f.close()
+					sys.exit()
+				else:
+					print('HF calculation complete.\n')	
+					outdir ='./HF'+os.sep+'hf.out'
+					f = open(outdir,'wb')
+					f.write(out)
+					f.close()
+
+		else:
+			#no HF/INFO_TIME found
+			self.vasp_run(self.dir)
+			self.update_win()
+			self.run_wan90()
+			self.copy_files_hf()
+			print('Running HF...')
+			cmd = 'cd '+'HF'+ ' && '+ 'RUNDMFT_HF.py' #+ " > dft.out 2> dft.error"
+			out, err = subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()
+			if err:
+				print('HF calculation failed! Check hf.error for details.\n')
+				errdir = './HF'+os.sep+'hf.error'
+				f = open(errdir,'wb')
+				f.write(err)
+				f.close()
+				sys.exit()
+			else:
+				print('HF calculation complete.\n')	
+				outdir ='./HF'+os.sep+'hf.out'
+				f = open(outdir,'wb')
+				f.write(out)
+				f.close()			
+
 
 if __name__ == "__main__":
 
@@ -352,6 +478,7 @@ if __name__ == "__main__":
 	parser.add_argument('-dftexec',default='vasp_std', type=str, help='The name of the chosed dft executable. \n E.g. vasp_std ')
 	parser.add_argument('-relax',action='store_true', help='Flag to check for DFT convergence. Program exits if not converged.')
 	parser.add_argument('-dmft',action='store_true',help='Flag to run DMFT. Checks for a previous DMFT calculation and runs only if it is incomplete.')
-	parser.add_argument('-fdmft',action='store_true',help='Flag to force DMFT calculation even if a previous DMFT calculation has been completed.')
+	parser.add_argument('-hf',action='store_true',help='Flag to perform Hartree-Fock calculation to the correlated orbitals.')
+	parser.add_argument('-force',action='store_true',help='Flag to force DMFT or HF calculation even if a previous calculation has been completed.')
 	args = parser.parse_args()
 	Initialize(args)
