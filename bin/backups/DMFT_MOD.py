@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 
 from scipy import *
 import os,sys,copy
@@ -63,7 +63,7 @@ class DMFT_class:
       self.cor_orb=cor_orb
       if os.path.exists('DMFT_mu.out'):
          self.mu=float(loadtxt('DMFT_mu.out'))
-      else: print("DMFT_mu.out file is missing"); exit()
+      else: print "DMFT_mu.out file is missing"; exit()
          
       #self.Ed=array([loadtxt('Ed.out')])
       #self.Natom=zeros(len(self.cor_at),dtype=int)
@@ -89,7 +89,7 @@ class DMFT_class:
       self.Sigoo=zeros((len(self.cor_at),2*TB.max_cor_orb),dtype=float)
       self.Vdc=zeros(len(self.cor_at),dtype=float)
       fi=open(sig_file,'r')
-      self.nom,self.ncor_orb=list(map(int,fi.readline()[16:].split()))
+      self.nom,self.ncor_orb=map(int,fi.readline()[16:].split())
       fi.readline()
       fi.readline()
       Sigoo=eval(fi.readline()[8:])
@@ -99,7 +99,7 @@ class DMFT_class:
       for i,ats in enumerate(self.cor_at):
          for j,orbs in enumerate(self.cor_orb[i]):
             if len(orbs)>0: idx+=1
-      if self.ncor_orb!=nspin*idx: print("The number of correlated orbitals in sig.inp and INPUT.py is not consistent"); exit()
+      if self.ncor_orb!=nspin*idx: print "The number of correlated orbitals in sig.inp and INPUT.py is not consistent"; exit()
                
       idx2=0
       for i,ats in enumerate(self.cor_at):
@@ -189,8 +189,8 @@ class DMFT_class:
          fileSig='imp.'+str(i)+'/Sig.out'
          if (os.path.exists(fileSig)): 
             (self.ommesh,Sig_file,TrS,Epot,nf_q,mom,Ekin,imp_mu) = Fileio.Read_complex_Data(fileSig)
-            if len(Sig_file)!=nspin*len(self.cor_orb[i]): print("The number of correated orbital is not same as Sig file column"); exit()
-            if len(mom)!=nspin*len(self.cor_orb[i]): print("The number of correated orbital is not same as mom list in Sig file"); exit()
+            if len(Sig_file)!=nspin*len(self.cor_orb[i]): print "The number of correated orbital is not same as Sig file column"; exit()
+            if len(mom)!=nspin*len(self.cor_orb[i]): print "The number of correated orbital is not same as mom list in Sig file"; exit()
             #if self.nom>len(ommesh_long): print "nom should be decreased!"; exit()
             self.Nd_imp[i]=nf_q
             for j,orbs in enumerate(self.cor_orb[i]):
@@ -236,8 +236,8 @@ class DMFT_class:
          fi=open('UC'+str(i+1)+'.dat','r')
          UC=[]
          for line in fi.readlines():
-            UC.append(list(map(float,line.split())))
-         if len(UC)!=2*len(d_orb): print("The size of UC is not consistent with orb"); exit()
+            UC.append(map(float,line.split()))
+         if len(UC)!=2*len(d_orb): print "The size of UC is not consistent with orb"; exit()
          UC=array(UC)+U[i]-diag(ones(2*len(d_orb))*U[i])
          OCC=Compute_OCC(self.N_latt[i],self.MOM[i],d_orb)
          self.Sigoo[i,:2*len(d_orb)]=dot(UC,OCC)
@@ -258,7 +258,7 @@ class DMFT_class:
          elif dc_type==3:
             self.Vdc[i]=U[i]*(self.Nf[i]-0.5)-J[i]/2*(self.Nf[i]-1)
             self.Vdc_imp[i]=U[i]*(self.Nf[i]-0.5)-J[i]/2*(self.Nf[i]-1)
-         else: print("This dc type is not supported!"); exit()
+         else: print "This dc type is not supported!"; exit()
 
         # self.EHF+=len(ats)*0.5*dot(OCC,self.VHF[i][:2*len(d_orb)])
         # self.EHF_imp+=len(ats)*0.5*dot(OCC_imp,self.VHF_imp[i][:2*len(d_orb)])
@@ -307,7 +307,7 @@ class DMFT_class:
 
    def Mix_Sig_and_Print_sig_inp(self,TB,Nd_qmc,mix_sig,sig_file,nspin):
       fi=open(sig_file,'r')
-      self.nom,self.ncor_orb=list(map(int,fi.readline()[16:].split()))
+      self.nom,self.ncor_orb=map(int,fi.readline()[16:].split())
       fi.readline()
       fi.readline()
       Sigoo_old=eval(fi.readline()[8:])
@@ -534,7 +534,7 @@ class DMFT_class:
             #self.VDC[i]=Uprime[i]*(self.N_imp[i]-0.5)-J[i]/2*(self.N_imp[i]-1)
          elif dc_type==2:
             self.VDC[i]=(Uprime[i]-2*J[i])*(0.9*self.Nd_latt[i])-J[i]/2*(2*self.Nd_latt[i]/5)
-         else: print("dc type is wrong!"); exit()
+         else: print "dc type is wrong!"; exit()
 
    def Mix_DC(self,Uprime,J,self_dc,mix_dc,Nd_f):
       for i in range(len(self.Nd_latt)): 
@@ -557,7 +557,7 @@ class DMFT_class:
             self.VDC[i]=float(dc_array[1])
       for i in range(3): fi.readline()
       self.dm=array([float(dmi) for dmi in fi.readline().split()])
-      if len(self.VDC)!=len(cor_at): print("Specify VDC in dm.out as many as correlated atom"); exit()
+      if len(self.VDC)!=len(cor_at): print "Specify VDC in dm.out as many as correlated atom"; exit()
       fi.close()
   
 
@@ -676,11 +676,11 @@ if __name__=='__main__':
 
    import Struct,VASP
 
-   exec(compile(open('INPUT.py').read(), 'INPUT.py', 'exec')) # Read input file
+   execfile('INPUT.py') # Read input file
    TB=Struct.TBstructure('POSCAR',p['atomnames'],p['orbs'])
    cor_at=p['cor_at']; cor_orb=p['cor_orb']
    TB.Compute_cor_idx(cor_at,cor_orb)
-   print(TB.TB_orbs)
+   print TB.TB_orbs
    DFT=VASP.VASP_class()
    DMFT=DMFT_class(p,pC,TB)
    DMFT.Update_Sigoo_and_Vdc(TB,'sig.inp')

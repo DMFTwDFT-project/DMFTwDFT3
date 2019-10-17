@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 from scipy import *
 import sys, copy, re
 
@@ -13,11 +13,11 @@ def Read_complex_multilines(D_name,skipline=0):
    m=len(lines[0].split())
    Nom=len(lines)
    om_data=zeros(Nom,dtype=float)
-   Data=zeros((int((m-1)/2),Nom), dtype=complex)
+   Data=zeros(((m-1)/2,Nom), dtype=complex)
    for iom,line in enumerate(lines):
       l=line.split()
       om_data[iom]=float(l[0])
-      for ib in range(int((m-1)/2)):
+      for ib in range((m-1)/2):
          Data[ib,iom]=complex(float(l[1+ib*2]),float(l[2+ib*2]))
    return om_data, Data
 
@@ -96,12 +96,12 @@ def Print_complex_multilines(data,mesh,filename,headers=[]):
    n1=len(mesh)
    fi=open(filename,'w')
    for header in headers:
-      fi.write("%s \n" % header)
+      fi.write("$s" % header)
    for i in range(n1):
       for j in range(n0):
          if j==0: fi.write("%20.15f " %(mesh[i]))
          fi.write("%20.15f %20.15f " %(data[j,i].real, data[j,i].imag))
-      fi.write("\n")
+      fi.write("")
    fi.close()
 
 def Print_float(data,filename):
@@ -139,7 +139,7 @@ def Create_dmft_params(p,pC,N_atoms,atm_idx,sym_idx):
    for i in range(N_atoms):
       for j in range(len(sym_idx[atm_idx[i]])):
          f.write("%d " % sym_idx[atm_idx[i]][j])
-      f.write("\n")
+      f.write(" ")
    f.close()
 
 def Create_INPUT(p,pC,TB,T_high,noms_high,LFORCE=".FALSE."):
