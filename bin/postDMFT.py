@@ -128,7 +128,7 @@ class PostProcess:
 			os.makedirs("ac")			
 
 		#copying the last few self-energies from the DMFT run in the directory above
-		siglist = sorted(glob.glob("sig.inp.*"),key=os.path.getmtime)[-siglistindx:]
+		siglist = sorted(sorted(glob.glob("sig.inp.*"))[1:],key=lambda x:(len(x),float(x[8:])))[-siglistindx:]
 		for file in siglist:
 			shutil.copy(file,'ac')
 
@@ -425,7 +425,7 @@ class PostProcess:
 
 		print('Plotting plain band structure...')
 
-		vmm = [0,5.0]
+		vmm = [0,10.0]
 		nk=0
 		SKP=[]
 		SKPoints=[]
