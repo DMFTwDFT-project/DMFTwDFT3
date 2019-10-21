@@ -6,7 +6,7 @@ gaunt.so: gaunt.f90
 	$(CMP) -c $? -m gaunt 
 
 gutils.so: gutils.cxx
-	python setup.py build_ext --inplace
+	python2 setup.py build_ext --inplace
 
 fort_kpt_tools.so: fort_kpt_tools.f
 	$(CMP) -c $? -m fort_kpt_tools
