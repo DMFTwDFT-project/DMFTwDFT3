@@ -321,7 +321,7 @@ if __name__ == '__main__':
             print >> f, "NELM= "+str(p['Ndft'])
             f.close()
 
-         cmd = para_com+" "+"vaspDMFT > vasp.out 2> vasp.error || { echo 'Parallel run failed!'; exit 1; }"
+         cmd = para_com+" "+p['path_bin']+"vaspDMFT > vasp.out 2> vasp.error || { echo 'Parallel run failed!'; exit 1; }"
          out, err = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
          shutil.copy2('CHGCAR','CHGCAR.'+str(itt))
          #shutil.copy2('OSZICAR','OSZICAR.'+str(itt))

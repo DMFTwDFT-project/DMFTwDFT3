@@ -5,6 +5,8 @@ examples/
 ctqmc
 skrams
 vaspDMFT
+libdmft.a
+*.o
 
 #sphinx
 _build/
