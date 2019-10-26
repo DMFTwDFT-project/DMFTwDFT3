@@ -5,7 +5,7 @@ from scipy import *
 class VASP_class:
    def __init__(self):
       #pass
-      if not os.path.exists('DFT_mu.out'): print "DFT_mu.out should exist!"; exit() 
+      if not os.path.exists('DFT_mu.out'): print("DFT_mu.out should exist!"); exit()
       self.EFERMI=float(loadtxt('DFT_mu.out'))
       self.NBANDS=0
 
@@ -162,10 +162,18 @@ class VASP_class:
       print sqrt(diff_aug)
       return diff_chg
    
-   def Read_OSZICAR(self,finame='OSZICAR'):
-      fi=open(finame,'r')
-      self.E=float(fi.readlines()[-1].split()[2])
-      fi.close()
+   def Read_OSZICAR(self,finame='OSZICAR',dft='vasp',structurename=None):
+      if dft =='vasp':
+         fi=open(finame,'r')
+         self.E=float(fi.readlines()[-1].split()[2])
+         fi.close()
+      elif dft == 'siesta':
+         fi = open(structurename+'.out','r')
+         data = fi.read()
+         fi.close()
+         self.E = float(re.findall(r'Total\s=[\s0-9+-.]*',data)[0].split()[-1])  
+
+
    def Read_NBANDS(self):
       cmd="grep NBANDS= OUTCAR | sed 's/.* //g'"
       out, err = subprocess.Popen(cmd,shell=True,stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate() 

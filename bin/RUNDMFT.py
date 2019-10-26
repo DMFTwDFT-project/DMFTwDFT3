@@ -6,6 +6,8 @@ from os.path import getsize
 import Struct,Fileio,VASP, DMFT_MOD, IMP_SOLVER
 from scipy import *
 import shutil,copy,scipy.interpolate
+import argparse
+from argparse import RawTextHelpFormatter
 
 ###########################################################################
 #### This program executes VASP+DMFT using CTQMC impurity solver ##########
@@ -25,6 +27,15 @@ def CreateINCAR(params_vasp):
 
 
 if __name__ == '__main__':
+   #top level parser
+   des = 'This script performs the  DMFT calculation.' 
+   parser = argparse.ArgumentParser(description=des,formatter_class=RawTextHelpFormatter)
+   parser.add_argument('-structurename', type=str, help='Name of the structure. Not required for VASP. ' )
+   parser.add_argument('-dft',default='vasp', type=str, help='Choice of DFT code for the DMFT calculation.', choices=['vasp','siesta'])
+   parser.add_argument('-hf',action='store_true',help='Flag to perform Hartree-Fock calculation to the correlated orbitals.')
+   args = parser.parse_args()
+
+
    
    execfile('INPUT.py') # Read input file
 
@@ -90,9 +101,7 @@ if __name__ == '__main__':
    U=p['U'];J=p['J']
    T=1.0/pC['beta'][0]
    noms=p['noms']
-#   T_high=p['T_high']
-#   if T_high<1.0/pC['beta'][0]: T_high=1.0/pC['beta'][0]
-#   noms_high=int(p['noms']/(T_high*pC['beta'][0]))
+
    ########### Create symmetry index ################
    N_atoms=0
    for i,ats in enumerate(cor_at):
@@ -115,17 +124,6 @@ if __name__ == '__main__':
          for orb in orbs:
             idx[d_orb.index(orb)]=loc_idx
       sym_idx.append(idx.tolist())
-   #print sym_idx
-#      for at in ats:
-#   for i,ats in enumerate(cor_at):
-#      for ii,at in enumerate(ats):
-#         at_idx=int(at[-1])-1
-#         d_orb=TB.TB_orbs[at]
-#         for j,orbs in enumerate(cor_orb[i]):
-#            if ii==0: loc_idx+=1
-#            for orb in orbs:
-#               idx[d_orb.index(orb)]=loc_idx
-#         sym_idx[at_idx].append(idx)
 
    DMFT=DMFT_MOD.DMFT_class(p,pC,TB)
    DFT=VASP.VASP_class()
@@ -139,9 +137,14 @@ if __name__ == '__main__':
       main_out.write('\n')
       main_out.flush()
 
-      #if itt<p['Niter']-p['Nforce']: Fileio.Create_INPUT(p,pC,TB,T,noms,'.FALSE.')
-      #else: Fileio.Create_INPUT(p,pC,TB,T,noms,'.TRUE.')
       Fileio.Create_dmft_params(p,pC,N_atoms,atm_idx,sym_idx)
+
+      #Read siesta total energy
+      if args.dft == 'siesta':
+         fi = open(args.structurename+'.out','r')
+         data = fi.read()
+         fi.close()
+         DFT.E = float(re.findall(r'Total\s=[\s0-9+-.]*',data)[0].split()[-1])
 
       for it in range(p['Nit']):
          main_out.write( '--- Starting DMFT loop '+str(it+1)+now()+'---' )
@@ -166,36 +169,6 @@ if __name__ == '__main__':
                print out #, err
                cmd = 'cp UC.dat UC'+str(i+1)+'.dat'
                print os.popen(cmd).read()
-#            DMFT.Read_Sig(TB,p['nspin'])
-#            #print DMFT.Ekin,DMFT.Eimp,DMFT.imp_mu
-#            DMFT.Nd_latt=copy.deepcopy(DMFT.Nd_imp)
-#            DMFT.Compute_HF(1,p,TB)
-#            DMFT.Cmp_Sig_highT(T_high,noms_high,p['nspin'])
-#            #DMFT.Mix_Sig(p['mix_sig'])
-#            if TB.LHF=='.FALSE.':
-#               Fileio.Print_complex_multilines(DMFT.Sig,DMFT.ommesh,'SigMoo.out')
-#               if p['nspin']==2: Fileio.Print_complex_multilines(DMFT.Sig_dn,DMFT.ommesh,'SigMoo_dn.out')
-#               Fileio.Print_complex_multilines(DMFT.Sig_highT,DMFT.ommesh_highT,'SigMoo_highT.out')
-#               if p['nspin']==2: Fileio.Print_complex_multilines(DMFT.Sig_dn_highT,DMFT.ommesh_highT,'SigMoo_dn_highT.out')
-#
-#            if (os.path.exists('SigMdc.out')):
-#               pass
-#            else:
-#               fi=open('SigMdc.out','w')
-#               for data in DMFT.SigMdc:
-#                  print >>fi, data,
-#               print >>fi, ''
-#               fi.close()
-#            if p['nspin']==2: 
-#               if (os.path.exists('SigMdc_dn.out')):
-#                  pass
-#               else:
-#                  fi=open('SigMdc_dn.out','w')
-#                  for data in DMFT.SigMdc_dn:
-#                     print >>fi, data,
-#                  print >>fi, ''
-#                  fi.close()
-#   
    
          if it==0:
             DMFT.EKIN0=0
@@ -207,7 +180,6 @@ if __name__ == '__main__':
             fiEKIN.close()
 
          if TB.LHF=='.FALSE.':
-            #cmd = para_com+" "+p['path_bin']+"dmft_ksum_sp > ksum_output 2> ksum_error"
             cmd = para_com+" "+p['path_bin']+"dmft.x > ksum_output 2> ksum_error"
             out, err = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
          else: 
@@ -222,22 +194,10 @@ if __name__ == '__main__':
          DMFT.Update_Sigoo_and_Vdc(TB,'sig.inp',p['nspin'])
          DMFT.Update_Nlatt(TB,p['nspin'])
    
-#         if TB.LHF=='.FALSE.': DMFT_mu,ed,TrDeltaG=DMFT.Compute_Delta(DMFT.T,p['nspin'],cor_at,cor_orb,TB,p['nom'])
-#         
-#         if itt==0 and it==0:
-#            fi=open('VASP_mu.out','w')
-#            print >>fi, DMFT_mu      
-#            fi.close()
    
          main_out.write( '--- DMFT Ksum is finished '+now()+'---' )
          main_out.write('\n')
          main_out.flush()
-   
-   
-         #for i in range(len(cor_at)):
-         #   DMFT.sig_st[i][:]+=0.5*(DMFT.Nd_imp[i]-DMFT.Nd_latt[i])
-         #DMFT.Impurity_Solver
-         #if itt%3==0:
 
          om_loc,Delta=Fileio.Read_complex_multilines('Delta.out')
          loc_idx=-1
@@ -247,9 +207,8 @@ if __name__ == '__main__':
                loc_idx+=1
                Delta_loc[j,:]=copy.deepcopy(Delta[loc_idx,:])
                Fileio.Print_complex_multilines(Delta_loc,om_loc,'Delta'+str(i+1)+'.inp')
-       # shutil.copy2('Delta.out','Delta1.inp')
          Ed=array([loadtxt('Ed.out')])
-         if TB.LHF=='.FALSE.': IMP_SOLVER.RUN_CTQMC(p,pC,pD,it,itt,para_com,DMFT.mu,Ed,DMFT.Vdc)
+         if TB.LHF=='.FALSE.': IMP_SOLVER.RUN_CTQMC(p,pC,pD,it,itt,para_com,DMFT.mu,Ed,DMFT.Vdc,args.hf)
          main_out.write( '--- Impurity solver is finished '+now()+'---' )
          main_out.write('\n')
          main_out.flush()
@@ -257,11 +216,12 @@ if __name__ == '__main__':
 ################# Mix sig.inp ###############################3
 
          DMFT.Read_Sig(TB,p['nspin'])
-         DMFT.Compute_Energy(DFT,TB,Ed)
+         DMFT.Compute_Energy(DFT,TB,Ed,args.dft,args.structurename)
          DMFT.Compute_Sigoo_and_Vdc(p,TB)
          DMFT.Mix_Sig_and_Print_sig_inp(TB,p['Nd_qmc'],p['mix_sig'],'sig.inp',p['nspin'])
          shutil.copy2('sig.inp','sig.inp.'+str(itt+1)+'.'+str(it+1))
          shutil.copy2('G_loc.out','G_loc.out.'+str(itt+1)+'.'+str(it+1)) 
+
 
          DMFT.ETOT=DFT.E-DMFT.EKIN0+DMFT.EKIN+DMFT.EPOT-DMFT.Edc
          DMFT.ETOT2=DFT.E-DMFT.EKIN0+DMFT.EKIN+DMFT.EPOT2-DMFT.Edc_imp
@@ -274,71 +234,27 @@ if __name__ == '__main__':
          E_iter.write('\n')
          E_iter.flush()
  
-#      n_avg=int(p['Nit'])
-#      fiDMFT=open('ENERGY','r')
-#      Eline=fiDMFT.readlines()[-n_avg:]
-#      EAVG=0.; EAVG2=0.; 
-#      for i in range(n_avg):
-#         EAVG+=float(Eline[i].split()[2])
-#         EAVG2+=float(Eline[i].split()[4])
-#      fiDMFT.close()
-#      main_iter.write( '--------------------------\n' )
-#      main_iter.write( '%14.6f %14.6f %10.6f ' %(EAVG/n_avg, EAVG2/n_avg, CHGDIFF) )
-#      main_iter.write('\n')
-#      main_iter.write( '--------------------------\n' )
-#      main_iter.flush()
-#      E_iter.write( '%14.6f %14.6f' %(EAVG/n_avg, EAVG2/n_avg) )
-#      E_iter.write('\n')
-#      E_iter.flush()
-
-
-##################### CHARGE UPDATE ################
-#      if p['Nrelax']>p['Nforce']: print "Nrelax should not be larger than Nforce"; exit()
-#      if itt>=p['Niter']-p['Nrelax']:
-#         TB.Update_POSCAR('POSCAR')
-#         pV['NSW= ']=[5,'# NSW']
-#         pV['IBRION= ']=[1,'# IBRION']
-#         pV['ISIF= ']=[2,'# ISIF']
-#         pV['EDIFFG= ']=[-0.01,'# EDIFFG']
-#
-#
       if itt<p['Niter']-1:
          main_out.write( '--- Running vaspCHG '+now()+'---' )
          main_out.write('\n')
          main_out.flush()
    
-   #      #if itt>0:
-   #      #   cmd = para_com+" "+p['path_bin']+"XHF_fix_Nd.py > ksum_output 2> ksum_error"
-   #      #   out, err = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-   #
-   #         if pV.keys().count('NBANDS='): DFT.NBANDS=pV['NBANDS='][0]
-   #      DFT.Create_win(TB,p['atomnames'],p['orbs'],p['L_rot'],DFT.NBANDS,DFT.EFERMI+p['ewin'][0],DFT.EFERMI+p['ewin'][1])
-   #      if os.path.exists('CHGCAR') and itt==0:
-   #         CreateINCAR(pV)
          if itt==0:
             f = open('INCAR', 'a')
-   #         #print >> f, "LDMFT= .TRUE."
             print >> f, "NELM= "+str(p['Ndft'])
             f.close()
 
          cmd = para_com+" "+p['path_bin']+"vaspDMFT > vasp.out 2> vasp.error || { echo 'Parallel run failed!'; exit 1; }"
          out, err = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
          shutil.copy2('CHGCAR','CHGCAR.'+str(itt))
-         #shutil.copy2('OSZICAR','OSZICAR.'+str(itt))
          if itt>0:
             DFT.Read_NELECT()
             CHGDIFF=DFT.Diff_CHGCAR('CHGCAR.'+str(itt-1),'CHGCAR.'+str(itt))
          DFT.Read_NBANDS()
          DFT.Read_EFERMI()
          DFT.Update_win(DFT.NBANDS,DFT.EFERMI+p['ewin'][0],DFT.EFERMI+p['ewin'][1])
-   #      if itt==0:
-   #
-   #      if itt>0:# or (not os.path.exists('CHGCAR')):
          print os.popen("rm wannier90.chk").read()
          print os.popen("rm wannier90.chk.fmt").read()
-   ##         print os.popen("rm wannier90.eig").read()
-   #
-   #      #if itt<p['Niter']-1:
          main_out.write( '-------------- Running wannier 90 '+str(itt+1)+'----------------' )
          main_out.write('\n')
          main_out.flush()

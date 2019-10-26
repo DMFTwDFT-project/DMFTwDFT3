@@ -234,7 +234,7 @@ class PostProcess:
 		self.interpol(args.emin,args.emax,args.rom,args.broaden,dest_dir)	
 
 		#copying files from DMFT directory to dos directory
-		cmd = "cd dos && Copy_input_bands.py ../ -dos"
+		cmd = "cd dos && Copy_input.py ../ -post dos"
 		out, err = subprocess.Popen(cmd, shell=True).communicate()
 		if err:
 			print('File copy failed!\n')
@@ -379,7 +379,7 @@ class PostProcess:
 		fi.close() 
 
 		#copying files from DMFT directory to dos directory
-		cmd = "cd bands && Copy_input_bands.py ../ -bands"
+		cmd = "cd bands && Copy_input.py ../ -post bands"
 		out, err = subprocess.Popen(cmd, shell=True).communicate()
 		if err:
 			print('File copy failed!\n')
@@ -563,7 +563,7 @@ class PostProcess:
 if __name__ == "__main__":
 
 	#top level parser
-	print('\n--------------------------------- \n| DMFTwDFT post-processing tool |\n---------------------------------\n')
+	print('\n-------------------------------------- \n| Welcome to the DMFTwDFT post-processing tool |\n--------------------------------------\n')
 	des = 'This tool performs Analytic Contiunation, Density of States and Band structure calculations from DMFTwDFT outputs.' 
 	parser = argparse.ArgumentParser(description=des,formatter_class=RawTextHelpFormatter)
 	subparsers = parser.add_subparsers(help = 'sub-command help')
