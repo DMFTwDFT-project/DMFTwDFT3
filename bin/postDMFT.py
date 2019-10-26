@@ -149,8 +149,9 @@ class PostProcess:
 		if os.path.exists("maxent_params.dat"):
 		    shutil.copyfile('maxent_params.dat','./ac/maxent_params.dat')
 		else:
-		    src=self.path_bin+ os.sep+"maxent_params.dat"
-		    shutil.copyfile(src,"./ac/maxent_params.dat")
+		    src=self.path_bin+os.sep+"maxent_params.dat"
+		    src_path = os.path.abspath(os.path.expanduser(os.path.expandvars(src)))
+		    shutil.copyfile(src_path,"./ac/maxent_params.dat")
 
 		#Analytic continuation
 		print('Running analytic continuation...')
