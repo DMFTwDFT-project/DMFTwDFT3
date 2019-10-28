@@ -539,8 +539,9 @@ if __name__ == "__main__":
 	#parser for dft  
 	parser.add_argument('-dft',default='vasp', type=str, help='Choice of DFT code for the DMFT calculation.', choices=['vasp','siesta'])
 	parser.add_argument('-relax',action='store_true', help='Flag to check for DFT convergence. Program exits if not converged.')
-	parser.add_argument('-dmft',action='store_true',help='Flag to run DMFT. Checks for a previous DMFT calculation and runs only if it is incomplete.')
-	parser.add_argument('-hf',action='store_true',help='Flag to perform Hartree-Fock calculation to the correlated orbitals.')
+	type_parser=parser.add_mutually_exclusive_group()
+	type_parser.add_argument('-dmft',action='store_true',help='Flag to run DMFT. Checks for a previous DMFT calculation and runs only if it is incomplete.')
+	type_parser.add_argument('-hf',action='store_true',help='Flag to perform Hartree-Fock calculation to the correlated orbitals.')
 	parser.add_argument('-force',action='store_true',help='Flag to force DMFT or HF calculation even if a previous calculation has been completed.')
 	parser.add_argument('-structurename', type=str, help='Name of the structure. Not required for VASP. ' )
 	parser.add_argument('-kmeshtol',default=0.00001, type=float, help='The tolerance to control if two k-points belong to the same shell in wannier90.')
