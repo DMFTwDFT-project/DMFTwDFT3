@@ -9,7 +9,6 @@ import Struct
 from INPUT import *
 import argparse
 from argparse import RawTextHelpFormatter
-import pymatgen.io.vasp as vasp
 import pychemia
 import re
 
@@ -217,72 +216,72 @@ class Initialize():
 			sys.exit()
 
 
+	def read_outcar(self,outcarpath):
+		"""This function reads the OUTCAR file if exists from VASP calculations
+		"""
+		if os.path.exists(outcarpath+os.sep+'OUTCAR'):
+			return pychemia.code.vasp.VaspOutput(outcarpath+os.sep+'OUTCAR')
+		else:
+			print('OUTCAR not found.')
+			return False	
+
 	def vasp_convergence(self):
 
 		"""
-		This method checks for convergence inside the DFT_relax directory 
+		This function checks for convergence inside the DFT_relax directory 
 		and copies CONTCAR as POSCAR to root directory. Otherwise it runs vasp for convergence.
 		If you want better convergence remember to copy an updated INCAR in the DFT_relax directory.
 		"""
 
-		#First check if  converged	
-		if os.path.exists('./DFT_relax'):
-			if os.path.exists('./DFT_relax/vasprun.xml'):
-				try:
-					vasprun = vasp.Vasprun('./DFT_relax/vasprun.xml')
-
-					if vasprun.converged_ionic == True:
-						print('Ionic convergence reached. Copying CONTCAR to root directory.')
-						copyfile('./DFT_relax/CONTCAR','./POSCAR')
-
-					else:	
-						print('Convergence not reached. Recalculating with higher convergence parameters.')
-						self.vasp_run('./DFT_relax')	
-
-						try:
-							vasprun = vasp.Vasprun('./DFT_relax/vasprun.xml')
-							if vasprun.converged_ionic == True:
-								print('Ionic convergence reached. Copying CONTCAR to root directory.')
-								copyfile('./DFT_relax/CONTCAR','./POSCAR')
-							else:
-								print('Convergence not reached. Update convergence parameters.')
-								sys.exit()
-						except:
-							print('vasprun.xml is incomplete. This is a result of an incomplete VASP calculation.')	
-							sys.exit()
-				except:
-					print('vasprun.xml is incomplete. This is a result of an incomplete VASP calculation.')		
-					print('Restarting VASP calculation...')	
-					self.vasp_run('./DFT_relax')
-					try:
-						vasprun = vasp.Vasprun('./DFT_relax/vasprun.xml')	
-						if vasprun.converged_ionic == True:
-							print('Ionic convergence reached. Copying CONTCAR to root directory.')
-							copyfile('./DFT_relax/CONTCAR','./POSCAR')
-						else:
-							print('Convergence not reached. Update convergence parameters.')
-							sys.exit()
-					except:
-						print('vasprun.xml is incomplete. This is a result of an incomplete VASP calculation.')		
-						sys.exit()
+		def check_relax(vaspout):
+			#Checks for convergence
+			ediffg  = abs(pychemia.code.vasp.VaspInput('./DFT_relax/INCAR').EDIFFG) 
+			avg_force = vaspout.relaxation_info()['avg_force']
+			print('EDIFFG = %f and Average force = %f' % (ediffg,avg_force))
+			if avg_force <= ediffg:
+				print('Forces are converged.')
+				return True
 			else:
-				print('DFT_relax directory exists but vasprun.xml does not. Running VASP now.')	
-				self.vasp_run('./DFT_relax')
+				print('Forces are not converged.')
+				return False
 
-
-				try:
-					vasprun = vasp.Vasprun('./DFT_relax/vasprun.xml')	
-					if vasprun.converged_ionic == True:
-						print('Ionic convergence reached. Copying CONTCAR to root directory.')
-						copyfile('./DFT_relax/CONTCAR','./POSCAR')
-					else:
-						print('Convergence not reached. Update convergence parameters.')
-						sys.exit()
-				except:
-					print('vasprun.xml is incomplete. This is a result of an incomplete VASP calculation.')		
+		if os.path.exists('DFT_relax'):
+			vaspout = self.read_outcar('DFT_relax')
+			if vaspout:
+				if vaspout.is_finished and check_relax(vaspout):					
+					print('Copying CONTCAR to root directory.\n')
+					copyfile('./DFT_relax/CONTCAR','POSCAR')
+				else:
+					print('Recalculating...')	
+					self.vasp_run('./DFT_relax')
+					vaspout = self.read_outcar('DFT_relax')							
+					if vaspout:
+						if vaspout.is_finished and check_relax(vaspout):					
+							print('Copying CONTCAR to root directory.\n')
+							copyfile('./DFT_relax/CONTCAR','POSCAR')	
+						else:
+							print('Update convergence parameters. Exiting.')
+							sys.exit()	
+			else:
+				if os.path.isfile('./DFT_relax/INCAR') \
+				and os.path.isfile('./DFT_relax/POTCAR') \
+				and os.path.isfile('./DFT_relax/POSCAR') \
+				and os.path.isfile('./DFT_relax/KPOINTS'):
+					print('DFT_relax directory exists. Recalculating...')	
+					self.vasp_run('./DFT_relax')
+					vaspout = self.read_outcar('DFT_relax')							
+					if vaspout:
+						if vaspout.is_finished and check_relax(vaspout):					
+							print('Copying CONTCAR to root directory.\n')
+							copyfile('./DFT_relax/CONTCAR','POSCAR')	
+						else:
+							print('Update convergence parameters. Exiting.')
+							sys.exit()	
+				else:
+					print('VASP input files missing. Exiting.')
 					sys.exit()
 		else:
-			print('DFT_relax directory does not exist.')
+			print('DFT_relax directory does not exist. Convergence failed.')
 			sys.exit()
 
 	def update_win(self):
