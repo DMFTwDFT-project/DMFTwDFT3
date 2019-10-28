@@ -26,6 +26,18 @@ class PostProcess:
 	"""DMFTwDFT PostProcess
 
 	This class contains methods to perform post processing of the DMFT calculations. 
+	Run inside the DMFT or HF directories.
+
+	Run with:
+	postDMFT.py <options>
+
+	-h for help.
+
+	<options>:
+	ac    : Performs analytic continuation. 
+	dos   : Performs density of states calculation.
+	bands : Performs band structure calculation. 
+
 
 
 	"""
