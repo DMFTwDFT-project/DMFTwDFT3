@@ -270,9 +270,9 @@ class PostProcess:
 			print('DMFT DOS calculation complete.\n')		
 
 		if args.plot:
-			self.plot_dos()	
+			self.plot_dos(args)	
 
-	def plot_dos(self):
+	def plot_dos(self,args):
 		"""
 		This method plots the density of states plot. 
 		"""
@@ -302,6 +302,7 @@ class PostProcess:
 		plt.title('DMFT PDOS')  
 		plt.xlabel('Energy (eV)')
 		plt.ylabel('DOS (states eV/cell)')
+		plt.xlim(args.elim)
 		plt.axvline(x=0,color='gray',linestyle='--')
 		plt.legend()
 		plt.savefig('./dos/DMFT-PDOS.png')
@@ -419,7 +420,7 @@ class PostProcess:
 				sys.exit()
 			else:
 				print('Band structure calculation complete.\n')
-				self.plot_plain_bands()
+				self.plot_plain_bands(args)
 
 		if args.plotpartial:
 			print("\nCalculating projected band structure...")
@@ -431,16 +432,19 @@ class PostProcess:
 				sys.exit()
 			else:
 				print('Band structure calculation complete.\n')	
-				self.plot_partial_bands(args.wanorbs)
+				self.plot_partial_bands(args)
 
-	def plot_plain_bands(self):
+	def plot_plain_bands(self,args):
 		"""
 		This method plots the regular DMFT band structure.
 		"""
 
 		print('Plotting plain band structure...')
 
-		vmm = [0,10.0]
+		if args.vlim:
+			vmm = [args.vlim[0],args.vlim[1]]
+		else:	
+			vmm = [0,10.0]
 		nk=0
 		SKP=[]
 		SKPoints=[]
@@ -493,15 +497,18 @@ class PostProcess:
 		show()
 		savefig('./bands/A_k.eps')
 
-	def plot_partial_bands(self,wan_orbs):	
+	def plot_partial_bands(self,args):	
 		"""
 		This method plots partial bands for orbitals. The order of the orbitals is the Wannier orbital order. 
 		"""
 
 		print('Plotting projected band structure...')
-		print('Wannier orbitals list:',wan_orbs)
+		print('Wannier orbitals list:',args.wanorbs)
 
-		vmm = [0,10]
+		if args.vlim:
+			vmm = [args.vlim[0],args.vlim[1]]
+		else:	
+			vmm = [0,10.0]
 		SKP=[]
 		SKPoints=[]
 		distk=[]
@@ -535,22 +542,22 @@ class PostProcess:
 		for i in range(numk):    
 			#kpts.append(list(map(float,data[i].split('\n')[0].split()[1:]))) 
 
-			for orbs in wan_orbs:
+			for orbs in args.wanorbs:
 				filtered_orbs.append(data[i].split('\n')[1:][(orbs-1)*nom+orbs:orbs*nom+orbs])
 
-		for orb_counter in range(numk*len(wan_orbs)):
+		for orb_counter in range(numk*len(args.wanorbs)):
 			for j in range(nom): 
 				A_k.append(-1*float(filtered_orbs[orb_counter][j].split()[2])/3.14159265)
 				om.append(float(filtered_orbs[orb_counter][j].split()[0]))
 
 		A_k=np.array(A_k)
-		A_k=A_k.reshape(numk,nom*len(wan_orbs))  
+		A_k=A_k.reshape(numk,nom*len(args.wanorbs))  
 
-		A_kblend=np.zeros((len(wan_orbs),numk,nom))
+		A_kblend=np.zeros((len(args.wanorbs),numk,nom))
 		A_ktotal=np.zeros((numk,nom))
 
 		nom_counter=0
-		for orb in range(len(wan_orbs)):
+		for orb in range(len(args.wanorbs)):
 			A_kblend[orb,:,:] = A_k[:,nom_counter:nom_counter+nom]
 			nom_counter=nom_counter+nom
 			A_ktotal=A_ktotal+A_kblend[orb,:,:]
@@ -558,7 +565,7 @@ class PostProcess:
 		A_ktotal = np.transpose(A_ktotal)[::-1]    
 
 		om=np.array(om)
-		om=om.reshape(numk,nom*len(wan_orbs))
+		om=om.reshape(numk,nom*len(args.wanorbs))
 
 		(ymin,ymax) = (om[0][0],om[0][-1]) #500x100 energy matrix
 		(xmin,xmax) = (distk[0],distk[-1])
@@ -608,6 +615,7 @@ if __name__ == "__main__":
 	parser_dos.add_argument('-rom',default=1000, type=int, help='Matsubara Frequency (omega) points')
 	parser_dos.add_argument('-broaden',default=0.03, type=float, help='Broadening')
 	parser_dos.add_argument('-plot',action='store_true', help='Plot the density of states?')
+	parser_dos.add_argument('-elim',type=float, nargs=2,help='Energy range to plot')
 	parser_dos.set_defaults(func=PostProcess().dos)
 
 	#parser for bands 
@@ -622,6 +630,7 @@ if __name__ == "__main__":
 	parser_bands.add_argument('-plotplain',action='store_true', help='Flag to plot plain band structure')
 	parser_bands.add_argument('-plotpartial',action='store_true', help='Flag to plot projected band structure')
 	parser_bands.add_argument('-wo','--wanorbs',default=[4,5,6,7,8],type=int,nargs='+',help='List of Wannier orbitals to project')
+	parser_bands.add_argument('-vlim',type=float, nargs=2,help='Spectral intensity range')
 	parser_bands.set_defaults(func=PostProcess().bands)
 
 	#parser for oreo
