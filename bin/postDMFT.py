@@ -171,6 +171,7 @@ class PostProcess:
 		print('Running analytic continuation...')
 		cmd = "cd ac && maxent_run.py sig.inpx >ac.out 2>ac.error"
 		out, err = subprocess.Popen(cmd, shell=True,stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()
+		
 		if os.path.exists("./ac/Sig.out"):
 		    print('Analytic continuation complete.\n')  
 		else:
@@ -269,8 +270,8 @@ class PostProcess:
 		else:
 			print('DMFT DOS calculation complete.\n')		
 
-		if args.plot:
-			self.plot_dos(args)	
+		#calling dos plotting
+		self.plot_dos(args)	
 
 	def plot_dos(self,args):
 		"""
@@ -306,7 +307,8 @@ class PostProcess:
 		plt.axvline(x=0,color='gray',linestyle='--')
 		plt.legend()
 		plt.savefig('./dos/DMFT-PDOS.png')
-		plt.show()
+		if args.show:
+			plt.show()
 		f.close()		
 				
 
@@ -494,9 +496,9 @@ class PostProcess:
 		ylabel('Energy',fontsize='xx-large')
 		axhline(y=0,color='black',ls='--')
 
-		show()
 		savefig('./bands/A_k.eps')
-
+		if args.show:
+			show()
 	def plot_partial_bands(self,args):	
 		"""
 		This method plots partial bands for orbitals. The order of the orbitals is the Wannier orbital order. 
@@ -578,9 +580,9 @@ class PostProcess:
 		ylabel('Energy',fontsize='xx-large')
 		axhline(y=0,color='black',ls='--')
 
-
-		plt.show()
 		plt.savefig('./bands/A_k_partial.eps')
+		if args.show:
+			show()
 
 	def oreo_call(self,args):
 		"""
@@ -614,7 +616,7 @@ if __name__ == "__main__":
 	parser_dos.add_argument('-emax',default=5.0, type=float, help='Maximum value for interpolation')
 	parser_dos.add_argument('-rom',default=1000, type=int, help='Matsubara Frequency (omega) points')
 	parser_dos.add_argument('-broaden',default=0.03, type=float, help='Broadening')
-	parser_dos.add_argument('-plot',action='store_true', help='Plot the density of states?')
+	parser_dos.add_argument('-show',action='store_true', help='Display the density of states')
 	parser_dos.add_argument('-elim',type=float, nargs=2,help='Energy range to plot')
 	parser_dos.set_defaults(func=PostProcess().dos)
 
@@ -626,11 +628,12 @@ if __name__ == "__main__":
 	parser_bands.add_argument('-sp',action='store_true', help='Spin polarized calculation?')
 	parser_bands.add_argument('-kpband',default=500,type=int,help='Number of k-points for band structure calculation')
 	parser_bands.add_argument('-kn','--knames',default=['$\Gamma$','X','M','$\Gamma$','R'],type=str,nargs='+',help='Names of the k-points')
-	parser_bands.add_argument('-kp','--kplist',default=[[0,0,0],[0.5,0,0],[0.5,0.5,0],[0,0,0],[0.5,0.5,0.5]],type=int,nargs='+',action='append',help='List of k-points as an array')
+	parser_bands.add_argument('-kp','--kplist',default=[[0,0,0],[0.5,0,0],[0.5,0.5,0],[0,0,0],[0.5,0.5,0.5]],type=int,nargs='+',action=append,help='List of k-points as an array')
 	parser_bands.add_argument('-plotplain',action='store_true', help='Flag to plot plain band structure')
 	parser_bands.add_argument('-plotpartial',action='store_true', help='Flag to plot projected band structure')
 	parser_bands.add_argument('-wo','--wanorbs',default=[4,5,6,7,8],type=int,nargs='+',help='List of Wannier orbitals to project')
 	parser_bands.add_argument('-vlim',type=float, nargs=2,help='Spectral intensity range')
+	parser_bands.add_argument('-show',action='store_true',help='Display the bands')
 	parser_bands.set_defaults(func=PostProcess().bands)
 
 	#parser for oreo
