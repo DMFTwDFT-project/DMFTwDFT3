@@ -235,8 +235,7 @@ class PostProcess:
 
 		#creating directory for dos 
 		if os.path.exists("dos"):
-			shutil.rmtree("dos")
-			os.makedirs("dos")
+			print('dos directory already exists.')
 		else:	
 			os.makedirs("dos")
 
@@ -321,8 +320,7 @@ class PostProcess:
 
 		#creating directory for bands
 		if os.path.exists("bands"):
-			shutil.rmtree("bands")
-			os.makedirs("bands")
+			print('bands directory already exists.')
 		else:	
 			os.makedirs("bands")
 
