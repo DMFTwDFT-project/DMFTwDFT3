@@ -628,7 +628,7 @@ if __name__ == "__main__":
 	parser_bands.add_argument('-sp',action='store_true', help='Spin polarized calculation?')
 	parser_bands.add_argument('-kpband',default=500,type=int,help='Number of k-points for band structure calculation')
 	parser_bands.add_argument('-kn','--knames',default=['$\Gamma$','X','M','$\Gamma$','R'],type=str,nargs='+',help='Names of the k-points')
-	parser_bands.add_argument('-kp','--kplist',default=[[0,0,0],[0.5,0,0],[0.5,0.5,0],[0,0,0],[0.5,0.5,0.5]],type=int,nargs='+',action=append,help='List of k-points as an array')
+	parser_bands.add_argument('-kp','--kplist',default=[[0,0,0],[0.5,0,0],[0.5,0.5,0],[0,0,0],[0.5,0.5,0.5]],type=int,nargs='+',action='append',help='List of k-points as an array')
 	parser_bands.add_argument('-plotplain',action='store_true', help='Flag to plot plain band structure')
 	parser_bands.add_argument('-plotpartial',action='store_true', help='Flag to plot projected band structure')
 	parser_bands.add_argument('-wo','--wanorbs',default=[4,5,6,7,8],type=int,nargs='+',help='List of Wannier orbitals to project')
