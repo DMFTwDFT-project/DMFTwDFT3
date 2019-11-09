@@ -8,19 +8,20 @@ def count_complete(args):
 	This methods checks to see if the DMFT calculation is done
 	by checking if "Done" is printed in INFO_TIME. It also checks
 	for completeness in post-processing calculations. 
+	
+	Should be executed in the root directory of a DMFT or HF
+	calculation. It checks for multiple calculation within
+	the root directory as well.
 
 	Parameters
 	----------
-	path : str
-		The Path to the DMFT/HF directory. 
-		Could be the root directory of many calculations as well.
 
 	type : str
 		The type of calculation. Either DMFT or HF.
 
 	post : str
 		Checks for completeness of post-processing calculations. 
-		ac, dos or bands. 
+		ac, dos, plainbands or partialbands. 
 
 
 	"""
