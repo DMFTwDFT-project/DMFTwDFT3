@@ -10,7 +10,7 @@ def count_complete(args):
 	for completeness in post-processing calculations. 
 	
 	Should be executed in the root directory of a DMFT or HF
-	calculation. It checks for multiple calculation within
+	calculation. It checks for multiple calculations within
 	the root directory as well.
 
 	Parameters
