@@ -35,7 +35,7 @@ def count_complete(args):
 	done_counter = 0
 
 	try:
-		pathlist = sorted([int(d) for d in os.listdir(args.path) if os.path.isdir(d)])
+		pathlist = sorted([int(d) for d in os.listdir('.') if os.path.isdir(d)])
 		print(pathlist)
 	except:
 		pathlist = [os.getcwd()]
@@ -79,7 +79,6 @@ def count_complete(args):
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='This script checks to see if the DMFT/HF calculation is complete.')
-	parser.add_argument('path', type=str,default='./', help='Path to DMFT/HF directory')
 	parser.add_argument('-type',type=str,default='dmft',help='DMFT or HF',choices=['dmft','hf'])
 	parser.add_argument('-post',type=str,default=None,help='Check for post-processing completeness.',choices=['ac','dos','plainbands','partialbands'],nargs='+')
 	args = parser.parse_args()
