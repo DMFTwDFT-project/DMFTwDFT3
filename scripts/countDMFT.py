@@ -44,15 +44,20 @@ def count_complete(args):
 	for path in pathlist:
 
 		pathstr = str(path)+os.sep+args.type.upper()+os.sep+'INFO_TIME'
+		pathstriter = str(path)+os.sep+args.type.upper()+os.sep+'INFO_ITER'
 
-		if os.path.exists(pathstr):
+		if os.path.exists(pathstr) and os.path.exists(pathstriter):
 			fi=open(pathstr,'r')
 			done_word=fi.readlines()[-1]
 			fi.close()
+			fi=open(pathstriter,'r')
+			done_word_iter=fi.readlines()[-1].split()
+			fi.close()
+
 
 			if done_word.split()[0] == 'Calculation':
 				done_counter += 1
-				print('%s calculation complete at %s' %(args.type.upper(),path))
+				print('%s calculation complete at %s with %d DFT and %d %s iterations.' %(args.type.upper(),path,int(done_word_iter[0]),int(done_word_iter[1]),args.type.upper()))
 
 				if args.post:
 					for i in args.post:
@@ -73,7 +78,7 @@ def count_complete(args):
 
 
 		else:
-			print('INFO_TIME does not exist at %s' %path)
+			print('INFO_TIME/INFO_ITER does not exist at %s' %path)
 
 	
 	print('%d %s calculations have been completed.'%(done_counter,args.type.upper()))			
