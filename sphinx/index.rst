@@ -34,6 +34,7 @@ DMFTwDFT is an open-source, user-friendly framework to calculate electronic, vib
    :maxdepth: 2
  
    installation 
+   tutorials
    contributors
    cite
 
