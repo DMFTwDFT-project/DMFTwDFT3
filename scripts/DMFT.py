@@ -52,6 +52,13 @@ class Initialize():
 			fipa.close()
 		else:
 			self.para_com=""
+		
+		if os.path.exists('para_com_dft.dat'):
+			fid = open('para_com_dft.dat')
+			self.para_com_dft = str(fid.readline())[:-1]
+			fid.close()
+		else:
+			self.para_com_dft = ''
 
 		#import the VASP class. This can be used for other DFT codes as well.
 		self.DFT = VASP3.VASP_class()
@@ -168,7 +175,7 @@ class Initialize():
 
 		#initial VASP run
 		print("Running VASP in %s"%dir)
-		cmd = 'cd '+dir+ ' && '+ self.para_com+' '+self.vasp_exec #+ " > dft.out 2> dft.error"
+		cmd = 'cd '+dir+ ' && '+ self.para_com_dft+' '+self.vasp_exec #+ " > dft.out 2> dft.error"
 		out, err = subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()
 		if err:
 			print('DFT calculation failed! Check dft.error for details.\n')
