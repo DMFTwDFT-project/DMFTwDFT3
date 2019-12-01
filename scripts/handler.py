@@ -15,7 +15,6 @@ if __name__=='__main__':
       print os.popen(cmd).read()
       cmd="cd VASP_FD_"+str(ct+1)
       print os.popen(cmd).read()
-      cmd="mv POSCAR-00"+str(ct+1)
+      cmd="mv POSCAR-00"+str(ct+1)+" POSCAR"
       print os.popen(cmd).read()
       cmd="cd .."
-
