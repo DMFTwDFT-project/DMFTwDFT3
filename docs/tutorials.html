@@ -162,9 +162,14 @@ To perform a DFT+DMFT calculation, the following files should be present.</p>
 <li><p>INPUT.py : contains the input parameters that govern the DMFT calculation.</p></li>
 <li><p>DFT_mu.out : This is a guess for the DFT Fermi energy.</p></li>
 <li><p>para_com.dat : The number of processors used for the DMFT calculation. E.g. mpirun -np 32</p></li>
-<li><p>para_com_dft.dat : The number of processors used for the DFT calculation.</p></li>
+<li><p>para_com_dft.dat : The number of processors used for the DFT calculation. If not specified it will use the same as para_com.dat.</p></li>
 <li><p>DFT files: VASP = {POSCAR, KPOINTS, POTCAR, INCAR}, Siesta = {.fdf, .psf}</p></li>
 </ul>
+<p>Before you start remember to add the <code class="docutils literal notranslate"><span class="pre">bin</span></code> directory path in <code class="docutils literal notranslate"><span class="pre">INPUT.py</span></code> as the value for the key <code class="docutils literal notranslate"><span class="pre">path_bin</span></code>.
+Eg.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="s2">&quot;path_bin&quot;</span><span class="p">:</span><span class="s2">&quot;~/Dropbox/Research/Projects/DMFTwDFT/bin/&quot;</span>
+</pre></div>
+</div>
 <div class="section" id="dmft-calculation">
 <h2>DMFT calculation<a class="headerlink" href="#dmft-calculation" title="Permalink to this headline">¶</a></h2>
 <p>This performs the DFT + DMFT calculations through the script <code class="docutils literal notranslate"><span class="pre">DMFT.py</span></code>.

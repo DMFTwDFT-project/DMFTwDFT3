@@ -58,7 +58,7 @@ class Initialize():
 			self.para_com_dft = str(fid.readline())[:-1]
 			fid.close()
 		else:
-			self.para_com_dft = ''
+			self.para_com_dft = self.para_com 
 
 		#import the VASP class. This can be used for other DFT codes as well.
 		self.DFT = VASP3.VASP_class()
@@ -314,6 +314,9 @@ class Initialize():
 
 			self.DFT.Update_win(self.DFT.NBANDS,self.DFT.EFERMI+p['ewin'][0],self.DFT.EFERMI+p['ewin'][1])
 			shutil.copy('wannier90.win',self.structurename+'.win')
+
+			#Updating DFT_mu.out
+			np.savetxt('DFT_mu.out',[self.DFT.EFERMI])
 
 	def run_wan90_pp(self):
 		"""

@@ -7,8 +7,13 @@ To perform a DFT+DMFT calculation, the following files should be present.
 * INPUT.py : contains the input parameters that govern the DMFT calculation. 
 * DFT_mu.out : This is a guess for the DFT Fermi energy. 
 * para_com.dat : The number of processors used for the DMFT calculation. E.g. mpirun -np 32
-* para_com_dft.dat : The number of processors used for the DFT calculation. 
+* para_com_dft.dat : The number of processors used for the DFT calculation. If not specified it will use the same as para_com.dat. 
 * DFT files: VASP = {POSCAR, KPOINTS, POTCAR, INCAR}, Siesta = {.fdf, .psf}	
+
+Before you start remember to add the ``bin`` directory path in ``INPUT.py`` as the value for the key ``path_bin``.
+Eg.::
+
+	"path_bin":"~/Dropbox/Research/Projects/DMFTwDFT/bin/"
 
 
 DMFT calculation

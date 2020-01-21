@@ -1,8 +1,7 @@
 *.pyc
 .DS_Store
-examples/
+examples/run_examples/
 *.so
-ctqmc
 skrams
 vaspDMFT
 libdmft.a

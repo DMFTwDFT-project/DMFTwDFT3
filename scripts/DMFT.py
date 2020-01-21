@@ -315,6 +315,9 @@ class Initialize():
 			self.DFT.Update_win(self.DFT.NBANDS,self.DFT.EFERMI+p['ewin'][0],self.DFT.EFERMI+p['ewin'][1])
 			shutil.copy('wannier90.win',self.structurename+'.win')
 
+			#Updating DFT_mu.out
+			np.savetxt('DFT_mu.out',[self.DFT.EFERMI])
+
 	def run_wan90_pp(self):
 		"""
 		This function performs the wannier90 pre-processing required by some DFT codes like siesta. 
