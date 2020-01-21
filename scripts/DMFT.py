@@ -58,7 +58,7 @@ class Initialize():
 			self.para_com_dft = str(fid.readline())[:-1]
 			fid.close()
 		else:
-			self.para_com_dft = ''
+			self.para_com_dft = self.para_com 
 
 		#import the VASP class. This can be used for other DFT codes as well.
 		self.DFT = VASP3.VASP_class()
