@@ -50,6 +50,8 @@ v2.0 July 10, 2019 - DMFTwDFT library version
 
 v3.0 November 25, 2019 - Added DMFT.py and postDMFT.py scripts
 
+v4.0 February 1,2020 - Added spin-polarized DMFT calculations
 
 
-	
+
+​	

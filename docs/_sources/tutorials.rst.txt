@@ -88,6 +88,7 @@ This script performs anaytical continuation, density of states and band structur
 	- -kp : A list of k-points corresponding to the the k-point labels
 	- -plotplain : Flag to plot a plain band structure
 	- -plotpartial : Flag to plot a projected band structure
+	- -sp : Flag to plot spin-polarized band structure
 	- -wo : List of Wannier orbitals to project onto the band structure
 	- -vlim : Spectral intensity range
 	- -show : Display the bands
@@ -102,3 +103,4 @@ E.g.: ::
 	$postDMFT.py dos -show
 	$postDMFT.py bands -plotplain
 	$postDMFT.py bands -plotpartial -wo 4 5 6
+	$postDMFT.py bands -sp -show

@@ -114,7 +114,7 @@ class DMFT_class:
                      self.Sigoo[i,len(d_orb)+d_orb.index(orb)]=Sigoo[idx2]
                   else:
                      self.Sigoo[i,len(d_orb)+d_orb.index(orb)]=Sigoo[idx+idx2]
-               idx+=1
+               idx2+=1
       #print self.nom,self.ncor_orb
       #print self.Sigoo, self.Vdc
 

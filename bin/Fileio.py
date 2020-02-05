@@ -134,7 +134,8 @@ def Create_dmft_params(p,pC,N_atoms,atm_idx,sym_idx):
    f.write("# Number of total correlated atoms\n")
    f.write("%d\n" % N_atoms)
    f.write("# Number of correlated orbitals per atom\n")
-   f.write("%d\n" % len(sym_idx[atm_idx[0]]))
+   sym_indx_spin = len(sym_idx[atm_idx[0]])/p['nspin']
+   f.write("%d\n" % sym_indx_spin)
    f.write("# Orbital index for the self-energy at each atom\n")
    for i in range(N_atoms):
       for j in range(len(sym_idx[atm_idx[i]])):

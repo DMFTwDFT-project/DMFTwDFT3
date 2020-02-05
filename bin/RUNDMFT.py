@@ -71,7 +71,7 @@ if __name__ == '__main__':
    main_out.write('\n')
    main_out.flush()
 
-   DMFT_iter.write( '%12s %12s %12s %12s %12s %12s %12s' % ('# mu','TOT_ELEC','Nd[0]','Nd[-1]','EKIN','Sigoo-Vdc','<d_epsk>') )
+   DMFT_iter.write( '%9s %13s %13s %13s %13s %13s %13s' % ('# mu','TOT_ELEC','Nd[0]','Nd[-1]','EKIN','Sigoo-Vdc','<d_epsk>') )
    DMFT_iter.write('\n')
    DMFT_iter.flush()
 
@@ -114,15 +114,17 @@ if __name__ == '__main__':
          at_idx=int(at[-1])-1
          atm_idx[at_idx]=loc_idx
    #print atm_idx
+
    sym_idx=[]
    loc_idx=0
    for i,ats in enumerate(cor_at):
       d_orb=TB.TB_orbs[ats[0]]
-      idx=zeros(len(d_orb),dtype=int)
-      for j,orbs in enumerate(cor_orb[i]):
-         loc_idx+=1
-         for orb in orbs:
-            idx[d_orb.index(orb)]=loc_idx
+      idx=zeros(len(d_orb)*p['nspin'],dtype=int)
+      for ispin in range(p['nspin']):
+         for j,orbs in enumerate(cor_orb[i]):
+            loc_idx+=1
+            for orb in orbs:
+               idx[d_orb.index(orb)+ispin*len(d_orb)]=loc_idx
       sym_idx.append(idx.tolist())
 
    DMFT=DMFT_MOD.DMFT_class(p,pC,TB)
@@ -199,15 +201,20 @@ if __name__ == '__main__':
          main_out.write('\n')
          main_out.flush()
 
+         Ed_loc=array(loadtxt('Ed.out'))
+         Ed=[]
          om_loc,Delta=Fileio.Read_complex_multilines('Delta.out')
          loc_idx=-1
          for i,ats in enumerate(cor_at):
-            Delta_loc=zeros((len(cor_orb[i]),len(om_loc)),dtype=complex)
-            for j,orbs in enumerate(cor_orb[i]):
-               loc_idx+=1
-               Delta_loc[j,:]=copy.deepcopy(Delta[loc_idx,:])
-               Fileio.Print_complex_multilines(Delta_loc,om_loc,'Delta'+str(i+1)+'.inp')
-         Ed=array([loadtxt('Ed.out')])
+            Delta_loc=zeros((len(cor_orb[i])*p['nspin'],len(om_loc)),dtype=complex)
+            Ed.append([])
+            for ispin in range(p['nspin']):
+               for j,orbs in enumerate(cor_orb[i]):
+                  loc_idx+=1
+                  Ed[i].append(Ed_loc[loc_idx])
+                  Delta_loc[j+ispin*len(cor_orb[i]),:]=copy.deepcopy(Delta[loc_idx,:])
+            Fileio.Print_complex_multilines(Delta_loc,om_loc,'Delta'+str(i+1)+'.inp')
+         Ed=array(Ed)
          if TB.LHF=='.FALSE.': IMP_SOLVER.RUN_CTQMC(p,pC,pD,it,itt,para_com,DMFT.mu,Ed,DMFT.Vdc,args.hf)
          main_out.write( '--- Impurity solver is finished '+now()+'---' )
          main_out.write('\n')

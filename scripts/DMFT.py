@@ -9,7 +9,6 @@ import Struct
 from INPUT import *
 import argparse
 from argparse import RawTextHelpFormatter
-import pychemia
 import re
 
 
@@ -85,10 +84,12 @@ class Initialize():
 			self.gen_win()	
 			self.gen_sig()
 			if args.relax:
+				import pychemia
 				self.vasp_convergence()
 
 		###################### Siesta  ######################################################		
 		if args.dft == 'siesta':		
+			import pychemia
 			self.dft = 'siesta'
 
 			#siesta executable

@@ -116,10 +116,10 @@ def RUN_CTQMC(p,pC,pD,it,itt,para_com,mu,ed,vdc,hf):
          print('ed[',i,']=',ed[i])
          if hf:
             print('Running Hartree-Fock')
-            pD['Eimp=']=array(ed[i])-ed[i][0] - array([0,100.0]) #array([1,2]) since the length of correlated orbitals is two
+            pD['Eimp=']=array(ed[0])-ed[i][0] - array([0,100.0]) #array([1,2]) since the length of correlated orbitals is two
          else:
             print('Running DMFT')
-            pD['Eimp=']=array(ed[i])-ed[i][0]
+            pD['Eimp=']=array(ed[0])-ed[i][0]
          print('Eimp =',pD['Eimp='])
          #else:
          #  pD['Eimp=']=array(list(ed[i])+list(ed[i]))-ed[i][0]#-array(list(vdc[i])+list(vdc[i]))+vdc[i][0]
