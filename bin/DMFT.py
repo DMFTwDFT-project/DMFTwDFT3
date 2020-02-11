@@ -84,12 +84,10 @@ class Initialize():
 			self.gen_win()	
 			self.gen_sig()
 			if args.relax:
-				import pychemia
 				self.vasp_convergence()
 
 		###################### Siesta  ######################################################		
 		if args.dft == 'siesta':		
-			import pychemia
 			self.dft = 'siesta'
 
 			#siesta executable
@@ -118,6 +116,7 @@ class Initialize():
 		"""
 		This function converts the siesta .fdf format to POSCAR for further calculations.
 		"""
+		import pychemia
 		file = pychemia.code.siesta.SiestaInput(self.structurename+'.fdf') 
 		self.st = file.get_structure()
 		pychemia.code.vasp.write_poscar(self.st, filepath='POSCAR', newformat=True, direct=True, comment=None) 
@@ -228,6 +227,7 @@ class Initialize():
 		"""This function reads the OUTCAR file if exists from VASP calculations
 		"""
 		if os.path.exists(outcarpath+os.sep+'OUTCAR'):
+			import pychemia
 			return pychemia.code.vasp.VaspOutput(outcarpath+os.sep+'OUTCAR')
 		else:
 			print('OUTCAR not found.')
@@ -243,6 +243,7 @@ class Initialize():
 
 		def check_relax(vaspout):
 			#Checks for convergence
+			import pychemia
 			ediffg  = abs(pychemia.code.vasp.VaspInput('./DFT_relax/INCAR').EDIFFG) 
 			avg_force = vaspout.relaxation_info()['avg_force']
 			print('EDIFFG = %f and Average force = %f' % (ediffg,avg_force))

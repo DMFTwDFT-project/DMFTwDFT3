@@ -292,7 +292,7 @@ class PostProcess:
 			sys.exit()	
 
 		#interpolating
-		self.interpol(args.emin,args.emax,args.rom,args.broaden,dest_dir)	
+		self.interpol(args.emin,args.emax,args.rom,args.broaden,dest_dir,args.sp)	
 
 		#copying files from DMFT directory to dos directory
 		cmd = "cd dos && Copy_input.py ../ -post dos"
@@ -826,6 +826,7 @@ if __name__ == "__main__":
 	parser_dos = subparsers.add_parser('dos',help = 'DMFT Density of States')
 	parser_dos.add_argument('-emin',default=-5.0, type=float, help='Minimum value for interpolation')
 	parser_dos.add_argument('-emax',default=5.0, type=float, help='Maximum value for interpolation')
+	parser_dos.add_argument('-sp',action='store_true', help='Flag to plot spin-polarized DOS')
 	parser_dos.add_argument('-rom',default=1000, type=int, help='Matsubara Frequency (omega) points')
 	parser_dos.add_argument('-broaden',default=0.03, type=float, help='Broadening')
 	parser_dos.add_argument('-show',action='store_true', help='Display the density of states')
