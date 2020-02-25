@@ -270,8 +270,6 @@ class PostProcess:
 						break
 		return idx
 
-
-
 	def dos(self,args):	    
 		""" 
 		This method performs the Density of States calculation.
@@ -304,16 +302,63 @@ class PostProcess:
 		else:
 			print(out)
 
-		#running dmft_dos.x
-		print("Calculating DMFT DOS...")
-		cmd ="cd dos && "+self.para_com+" "+"dmft_dos.x"
-		out, err = subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()
-		if err:
-			print(err)
-			print('DMFT DOS calculation failed!\n')
-			sys.exit()
+
+		if args.sp == False:
+
+			#running dmft_dos.x
+			print("Calculating DMFT DOS...")
+			cmd ="cd dos && "+self.para_com+" "+"dmft_dos.x"
+			out, err = subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()
+			if err:
+				print(err)
+				print('DMFT DOS calculation failed!\n')
+				sys.exit()
+			else:
+				print('DMFT DOS calculation complete.\n')		
+
 		else:
-			print('DMFT DOS calculation complete.\n')		
+			# Generating files to plot DOS
+			# read dmft_params.dat and set spin = 1
+			file = open('./dos/dmft_params.dat','r')
+			data = file.readlines()
+			file.close()
+			data[9] = '1\n'
+			file = open('./dos/dmft_params.dat','w')
+			for ele in data:
+				file.write(ele)
+			file.close()
+
+
+			# running dmft_dos.x for spin up
+			print("Calculating DMFT DOS for spin up...")
+			cmd ="cd dos && "+self.para_com+" "+"dmft_dos.x"
+			out, err = subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()
+			if err:
+				print(err)
+				print('DMFT DOS calculation failed!\n')
+				sys.exit()
+			else:
+				print('DMFT DOS calculation complete.\n')
+
+			#copying G_loc.out to G_loc_up.out
+			shutil.copyfile('./dos/G_loc.out','./dos/G_loc_up.out')	
+
+			#copying sig.inp_real_dn to sig.inp_real
+			shutil.copyfile('./dos/sig.inp_real_dn','./dos/sig.inp_real')	
+
+			# running dmft_dos.x for spin down 
+			print("Calculating DMFT DOS for spin down...")
+			cmd ="cd dos && "+self.para_com+" "+"dmft_dos.x"
+			out, err = subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()
+			if err:
+				print(err)
+				print('DMFT DOS calculation failed!\n')
+				sys.exit()
+			else:
+				print('DMFT DOS calculation complete.\n')
+
+			#copying G_loc.out to G_loc_dn.out
+			shutil.copyfile('./dos/G_loc.out','./dos/G_loc_dn.out')	
 
 		#calling dos plotting
 		self.plot_dos(args)	
@@ -322,40 +367,98 @@ class PostProcess:
 		"""
 		This method plots the density of states plot. 
 		"""
+		if args.sp==False:
+			print('Plotting DOS...')	
+			with open('./dos/G_loc.out', 'r') as f:
+				lines = f.readlines()
+				x = [float(line.split()[0]) for line in lines]
 
-		print('Plotting DOS...')	
-		with open('./dos/G_loc.out', 'r') as f:
-			lines = f.readlines()
-			x = [float(line.split()[0]) for line in lines]
-
-			y_dz2 = [float(line.split()[2]) for line in lines]  #eg
-			y_x2y2 = [float(line.split()[8]) for line in lines]
+				y_dz2 = [float(line.split()[2]) for line in lines]  #eg
+				y_x2y2 = [float(line.split()[8]) for line in lines]
 
 
-			y_dxz = [float(line.split()[4]) for line in lines]
-			y_dyz = [float(line.split()[6]) for line in lines]  #t2g
-			y_dxy = [float(line.split()[10]) for line in lines]
+				y_dxz = [float(line.split()[4]) for line in lines]
+				y_dyz = [float(line.split()[6]) for line in lines]  #t2g
+				y_dxy = [float(line.split()[10]) for line in lines]
 
-			yg= [float(line.split()[2])+float(line.split()[8]) for line in lines]
-			tg= [float(line.split()[4])+float(line.split()[6])+float(line.split()[10]) for line in lines]
+				yg= [float(line.split()[2])+float(line.split()[8]) for line in lines]
+				tg= [float(line.split()[4])+float(line.split()[6])+float(line.split()[10]) for line in lines]
 
-		y_eg =[-1*count/3.14 for count in yg]
-		y_t2g =[-1*count/3.14 for count in tg]  
-    
-		plt.figure(1)
-		plt.plot(x,y_eg,'r',label='$d-e_g$') 
-		plt.plot(x,y_t2g,'b',label='$d-t_{2g}$') 
-		plt.title('DMFT PDOS')  
-		plt.xlabel('Energy (eV)')
-		plt.ylabel('DOS (states eV/cell)')
-		plt.xlim(args.elim)
-		plt.axvline(x=0,color='gray',linestyle='--')
-		plt.legend()
-		plt.savefig('./dos/DMFT-PDOS.png')
-		if args.show:
+			y_eg =[-1*count/3.14 for count in yg]
+			y_t2g =[-1*count/3.14 for count in tg]  
+	    
+			plt.figure(1)
+			plt.plot(x,y_eg,'r',label='$d-e_g$') 
+			plt.plot(x,y_t2g,'b',label='$d-t_{2g}$') 
+			plt.title('DMFT PDOS')  
+			plt.xlabel('Energy (eV)')
+			plt.ylabel('DOS (states eV/cell)')
+			plt.xlim(args.elim)
+			plt.axvline(x=0,color='gray',linestyle='--')
+			plt.legend()
+			plt.savefig('./dos/DMFT-PDOS.png')
+			if args.show:
+				plt.show()
+			f.close()	
+
+		#Spin polarized case
+		if args.sp:
+			print('Plotting spin polarized DOS...')
+			with open('./dos/G_loc_up.out', 'r') as f:
+				lines = f.readlines()
+				x = [float(line.split()[0]) for line in lines]
+
+				y_dz2 = [float(line.split()[2]) for line in lines]  #eg
+				y_x2y2 = [float(line.split()[8]) for line in lines]
+
+
+				y_dxz = [float(line.split()[4]) for line in lines]
+				y_dyz = [float(line.split()[6]) for line in lines]  #t2g
+				y_dxy = [float(line.split()[10]) for line in lines]
+
+				yg= [float(line.split()[2])+float(line.split()[8]) for line in lines]
+				tg= [float(line.split()[4])+float(line.split()[6])+float(line.split()[10]) for line in lines]
+
+			y_eg =[-1*count/3.14 for count in yg]
+			y_t2g =[-1*count/3.14 for count in tg] 
+
+			#spin down component
+			with open('./dos/G_loc_dn.out', 'r') as f:
+				lines = f.readlines()
+				x_dn = [float(line.split()[0]) for line in lines]
+
+				y_dz2_dn = [float(line.split()[2]) for line in lines]  #eg
+				y_x2y2_dn = [float(line.split()[8]) for line in lines]
+
+
+				y_dxz_dn = [float(line.split()[4]) for line in lines]
+				y_dyz_dn = [float(line.split()[6]) for line in lines]  #t2g
+				y_dxy_dn = [float(line.split()[10]) for line in lines]
+
+			yg_dn= [float(line.split()[2])+float(line.split()[8]) for line in lines]
+			tg_dn= [float(line.split()[4])+float(line.split()[6])+float(line.split()[10]) for line in lines]
+
+			y_eg_dn =[1*count/3.14 for count in yg_dn]
+			y_t2g_dn =[1*count/3.14 for count in tg_dn] 
+
+			plt.figure(1)
+			plt.plot(x,y_eg,'r',label='$d-e_g$') 
+			plt.plot(x,y_t2g,'b',label='$d-t_{2g}$')
+			plt.plot(x_dn,y_eg_dn,'r') 
+			plt.plot(x_dn,y_t2g_dn,'b')  
+			plt.title('DMFT PDOS')  
+			plt.xlabel('Energy (eV)')
+			plt.ylabel('DOS (states eV/cell)')
+			plt.axvline(x=0,color='gray',linestyle='--')
+			plt.axhline(y=0,color='gray',linestyle='--')
+			plt.xlim(min(min(x),min(x_dn)),max(max(x),max(x_dn)))
+			plt.legend()
+			plt.savefig('DMFT-PDOS_sp.png')
 			plt.show()
-		f.close()		
-				
+			if args.show:
+				plt.show()
+			f.close()	
+			
 
 	def bands(self,args):
 		"""
