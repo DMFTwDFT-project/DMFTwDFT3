@@ -173,14 +173,14 @@ if __name__=='__main__':
 #            options.Edc = U*(nf-0.5)-0.5*J*(nf-1.)
             
         
-    omega = (arange(1,options.nom,1)*2-1)*pi*options.T
+    omega = (numpy.arange(1,options.nom,1)*2-1)*pi*options.T
     # writing to the file
     fo = open(options.outsig, 'w')
     print('# nom,ncor_orb=', options.nom-1, options.Nc, file=fo)
     print('# T=', (options.T), file=fo)
     print('# s_oo-Vdc=', ("0.0 "*(options.Nc)), file=fo)
-    print('# s_oo=', (ones(options.Nc)*options.Edc).tolist(), file=fo)
-    print('# Vdc=', (ones(options.Nc)*options.Edc).tolist(), file=fo)
+    print('# s_oo=', (numpy.ones(options.Nc)*options.Edc).tolist(), file=fo)
+    print('# Vdc=', (numpy.ones(options.Nc)*options.Edc).tolist(), file=fo)
     for iom,om in enumerate(omega):
         print(("%20.15f "%om), ("0.0 "*(2*options.Nc)), file=fo)
         
