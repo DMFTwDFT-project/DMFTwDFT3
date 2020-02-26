@@ -453,7 +453,7 @@ class PostProcess:
 			plt.axhline(y=0,color='gray',linestyle='--')
 			plt.xlim(min(min(x),min(x_dn)),max(max(x),max(x_dn)))
 			plt.legend()
-			plt.savefig('DMFT-PDOS_sp.png')
+			plt.savefig('./dos/DMFT-PDOS_sp.png')
 			plt.show()
 			if args.show:
 				plt.show()

@@ -2,6 +2,7 @@
 from scipy import *
 import os,sys,copy
 
+
 class TBstructure:
    def __init__(self,poscar,atomnames,orbs):
       self.orb_idx={}
