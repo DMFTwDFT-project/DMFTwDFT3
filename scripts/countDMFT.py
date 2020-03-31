@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 
-import sys,os
 import argparse
+import os
+import sys
 
 def count_complete(args):
 	"""
 	This methods checks to see if the DMFT calculation is done
 	by checking if "Done" is printed in INFO_TIME. It also checks
-	for completeness in post-processing calculations. 
-	
+	for completeness in post-processing calculations.
+
 	Should be executed in the root directory of a DMFT or HF
 	calculation. It checks for multiple calculations within
 	the root directory as well.
@@ -20,8 +21,8 @@ def count_complete(args):
 		The type of calculation. Either DMFT or HF.
 
 	post : str
-		Checks for completeness of post-processing calculations. 
-		ac, dos, plainbands or partialbands. 
+		Checks for completeness of post-processing calculations.
+		ac, dos, plainbands or partialbands.
 
 
 	"""
@@ -67,10 +68,10 @@ def count_complete(args):
 							ii = i
 						postpathstr = str(path)+os.sep+args.type.upper()+os.sep+ii+os.sep+filedic[i]
 						if os.path.exists(postpathstr):
-							print('%s complete.' %i)	
+							print('%s complete.' %i)
 						else:
-							print('%s incomplete.' %i)	
-					print('\n')	
+							print('%s incomplete.' %i)
+					print('\n')
 
 
 			else:
@@ -80,8 +81,8 @@ def count_complete(args):
 		else:
 			print('INFO_TIME/INFO_ITER does not exist at %s' %path)
 
-	
-	print('%d %s calculations have been completed.'%(done_counter,args.type.upper()))			
+
+	print('%d %s calculations have been completed.'%(done_counter,args.type.upper()))
 
 if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description='This script checks to see if the DMFT/HF calculation is complete.')
@@ -89,5 +90,3 @@ if __name__ == '__main__':
 	parser.add_argument('-post',type=str,default=None,help='Check for post-processing completeness.',choices=['ac','dos','plainbands','partialbands'],nargs='+')
 	args = parser.parse_args()
 	count_complete(args)
-
-		
