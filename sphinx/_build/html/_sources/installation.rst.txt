@@ -1,6 +1,10 @@
 Installation
 ============
-DMFTwDFT is currently supported by Python 2.x. Eventually, we will move on to Python 3.x.
+
+UPDATE:
+DMFTwDFT is currently in transition to Python 3.x, thus requires both Python 2.x and Python 3.x.
+A Python 2.x only version is available in the github repo but does not support the Siesta interface or the structural relaxation feature since PyChemia is fully Python 3.x now. 
+
 Please install the following dependencies prior to installing DMFTwDFT. 
 
 * matplotlib 

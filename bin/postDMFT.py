@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/env python3
 import sys, subprocess, os
 from scipy import *
 import copy, Fileio, re
@@ -25,7 +25,7 @@ import numpy as np
 class PostProcess:
 	"""DMFTwDFT PostProcess
 
-	This class contains methods to perform post processing of the DMFT calculations. 
+	This class contains methods to perform post processing of the DMFT calculations.
 	Run inside the DMFT or HF directories.
 
 	Run with:
@@ -34,9 +34,9 @@ class PostProcess:
 	-h for help.
 
 	<options>:
-	ac    : Performs analytic continuation. 
+	ac    : Performs analytic continuation.
 	dos   : Performs density of states calculation.
-	bands : Performs band structure calculation. 
+	bands : Performs band structure calculation.
 
 
 	"""
@@ -59,13 +59,13 @@ class PostProcess:
 		self.path_bin=p['path_bin']
 
 
-	def checksig(self):	
+	def checksig(self):
 		"""
 		Checks if Sig.out is created in the ac directory.
 		"""
 
 		if os.path.exists("./ac/Sig.out"):
-			return True 
+			return True
 		else:
 			print('Analytic Continuation incomplete. Sig.out not found.')
 			return False
@@ -75,7 +75,7 @@ class PostProcess:
 		"""
 		This performs the interpolation of points on the real axis.
 		"""
-		print('\nInterpolating points on real axis...') 
+		print('\nInterpolating points on real axis...')
 		headerline=2
 		om,Sig=Fileio.Read_complex_multilines('./ac/Sig.out',headerline)
 		s_oo = None
@@ -91,7 +91,7 @@ class PostProcess:
 		while("" in Vdc):
 			Vdc.remove('')
 
-			#exec(ar[0]) 
+			#exec(ar[0])
 			#m=re.search('#(.*)',line)
 			#exec(m.group(1).strip())
 		#s_oo_Vdc=array(s_oo)-array(Vdc)
@@ -123,7 +123,7 @@ class PostProcess:
 			if dest_dir =='dos':
 				Fileio.Print_complex_multilines(Sig_tot,ommesh,'./dos/sig.inp_real' ,[header1,header2,header3,header4,header5])
 
-			#create sig.inp_real 
+			#create sig.inp_real
 			if dest_dir =='bands':
 				Fileio.Print_complex_multilines(Sig_tot,ommesh,'./bands/sig.inp_real',[header1,header2,header3,header4,header5])
 
@@ -132,7 +132,7 @@ class PostProcess:
 		if sp:
 
 			Sig_tot = zeros((int(len(Sig)/2),rom),dtype=complex)
-			Sig_tot_dn = zeros((int(len(Sig)/2),rom),dtype=complex)	
+			Sig_tot_dn = zeros((int(len(Sig)/2),rom),dtype=complex)
 
 			for i in range(int(len(Sig)/2)):
 				#spin
@@ -163,7 +163,7 @@ class PostProcess:
 				Fileio.Print_complex_multilines(Sig_tot,ommesh,'./dos/sig.inp_real' ,[header1,header2,header3,header4,header5])
 				Fileio.Print_complex_multilines(Sig_tot_dn,ommesh,'./dos/sig.inp_real_dn' ,[header1,header2,header3_dn,header4_dn,header5_dn])
 
-			#create sig.inp_real 
+			#create sig.inp_real
 			if dest_dir =='bands':
 				Fileio.Print_complex_multilines(Sig_tot,ommesh,'./bands/sig.inp_real',[header1,header2,header3,header4,header5])
 				Fileio.Print_complex_multilines(Sig_tot_dn,ommesh,'./bands/sig.inp_real_dn' ,[header1,header2,header3_dn,header4_dn,header5_dn])
@@ -178,14 +178,14 @@ class PostProcess:
 		This method performs the analytic continuation.
 		"""
 
-		siglistindx = args.siglistindx	
+		siglistindx = args.siglistindx
 
 		#creating directory for ac
 		if os.path.exists("ac"):
 			shutil.rmtree("ac")
 			os.makedirs("ac")
-		else:	
-			os.makedirs("ac")			
+		else:
+			os.makedirs("ac")
 
 		#copying the last few self-energies from the DMFT run in the directory above
 		siglist = sorted(sorted(glob.glob("sig.inp.*"))[1:],key=lambda x:(len(x),float(x[8:])))[-siglistindx:]
@@ -202,8 +202,8 @@ class PostProcess:
 		 	print('Averaging self-energies Failed!\n')
 		 	sys.exit()
 		else:
-		 	print('Self-energies averaged.\n')  
-		  
+		 	print('Self-energies averaged.\n')
+
 
 		#copy maxent_params.dat from source if not in DMFT directory
 		if os.path.exists("maxent_params.dat"):
@@ -217,11 +217,11 @@ class PostProcess:
 		print('Running analytic continuation...')
 		cmd = "cd ac && maxent_run.py sig.inpx >ac.out 2>ac.error"
 		out, err = subprocess.Popen(cmd, shell=True,stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()
-		
+
 		if os.path.exists("./ac/Sig.out"):
-		    print('Analytic continuation complete.\n')  
+		    print('Analytic continuation complete.\n')
 		else:
-		    print('Analytic continuation failed! Check ac.error for details.\n') 
+		    print('Analytic continuation failed! Check ac.error for details.\n')
 		    sys.exit()
 
 	def Create_kpath(self,KPoints,nk_band):
@@ -246,8 +246,8 @@ class PostProcess:
 		klist.append(KPoints[-1])
 		dist_K.append(dist_K[-1]+dist(klist[-1],klist[-2]))
 		return array(klist), array(dist_K), array(dist_SK)
-	
-	def genksum(self,rom,kpband):	
+
+	def genksum(self,rom,kpband):
 		fp=open('./bands/ksum.input','w')
 		fp.write('%d' %kpband)
 		fp.write('\n%d' %rom)
@@ -270,27 +270,27 @@ class PostProcess:
 						break
 		return idx
 
-	def dos(self,args):	    
-		""" 
+	def dos(self,args):
+		"""
 		This method performs the Density of States calculation.
 		"""
 
 		dest_dir = 'dos'
 
-		#creating directory for dos 
+		#creating directory for dos
 		if os.path.exists("dos"):
 			print('dos directory already exists.')
-		else:	
+		else:
 			os.makedirs("dos")
 
 		#copy Sig.out into /dos
 		if self.checksig():
 			shutil.copyfile('./ac/Sig.out','./dos/Sig.out')
 		else:
-			sys.exit()	
+			sys.exit()
 
 		#interpolating
-		self.interpol(args.emin,args.emax,args.rom,args.broaden,dest_dir,args.sp)	
+		self.interpol(args.emin,args.emax,args.rom,args.broaden,dest_dir,args.sp)
 
 		#copying files from DMFT directory to dos directory
 		cmd = "cd dos && Copy_input.py ../ -post dos"
@@ -314,7 +314,7 @@ class PostProcess:
 				print('DMFT DOS calculation failed!\n')
 				sys.exit()
 			else:
-				print('DMFT DOS calculation complete.\n')		
+				print('DMFT DOS calculation complete.\n')
 
 		else:
 			# Generating files to plot DOS
@@ -341,12 +341,12 @@ class PostProcess:
 				print('DMFT DOS calculation complete.\n')
 
 			#copying G_loc.out to G_loc_up.out
-			shutil.copyfile('./dos/G_loc.out','./dos/G_loc_up.out')	
+			shutil.copyfile('./dos/G_loc.out','./dos/G_loc_up.out')
 
 			#copying sig.inp_real_dn to sig.inp_real
-			shutil.copyfile('./dos/sig.inp_real_dn','./dos/sig.inp_real')	
+			shutil.copyfile('./dos/sig.inp_real_dn','./dos/sig.inp_real')
 
-			# running dmft_dos.x for spin down 
+			# running dmft_dos.x for spin down
 			print("Calculating DMFT DOS for spin down...")
 			cmd ="cd dos && "+self.para_com+" "+"dmft_dos.x"
 			out, err = subprocess.Popen(cmd, shell=True, stdout = subprocess.PIPE, stderr = subprocess.PIPE).communicate()
@@ -358,17 +358,17 @@ class PostProcess:
 				print('DMFT DOS calculation complete.\n')
 
 			#copying G_loc.out to G_loc_dn.out
-			shutil.copyfile('./dos/G_loc.out','./dos/G_loc_dn.out')	
+			shutil.copyfile('./dos/G_loc.out','./dos/G_loc_dn.out')
 
 		#calling dos plotting
-		self.plot_dos(args)	
+		self.plot_dos(args)
 
 	def plot_dos(self,args):
 		"""
-		This method plots the density of states plot. 
+		This method plots the density of states plot.
 		"""
 		if args.sp==False:
-			print('Plotting DOS...')	
+			print('Plotting DOS...')
 			with open('./dos/G_loc.out', 'r') as f:
 				lines = f.readlines()
 				x = [float(line.split()[0]) for line in lines]
@@ -385,12 +385,12 @@ class PostProcess:
 				tg= [float(line.split()[4])+float(line.split()[6])+float(line.split()[10]) for line in lines]
 
 			y_eg =[-1*count/3.14 for count in yg]
-			y_t2g =[-1*count/3.14 for count in tg]  
-	    
+			y_t2g =[-1*count/3.14 for count in tg]
+
 			plt.figure(1)
-			plt.plot(x,y_eg,'r',label='$d-e_g$') 
-			plt.plot(x,y_t2g,'b',label='$d-t_{2g}$') 
-			plt.title('DMFT PDOS')  
+			plt.plot(x,y_eg,'r',label='$d-e_g$')
+			plt.plot(x,y_t2g,'b',label='$d-t_{2g}$')
+			plt.title('DMFT PDOS')
 			plt.xlabel('Energy (eV)')
 			plt.ylabel('DOS (states eV/cell)')
 			plt.xlim(args.elim)
@@ -399,7 +399,7 @@ class PostProcess:
 			plt.savefig('./dos/DMFT-PDOS.png')
 			if args.show:
 				plt.show()
-			f.close()	
+			f.close()
 
 		#Spin polarized case
 		if args.sp:
@@ -420,7 +420,7 @@ class PostProcess:
 				tg= [float(line.split()[4])+float(line.split()[6])+float(line.split()[10]) for line in lines]
 
 			y_eg =[-1*count/3.14 for count in yg]
-			y_t2g =[-1*count/3.14 for count in tg] 
+			y_t2g =[-1*count/3.14 for count in tg]
 
 			#spin down component
 			with open('./dos/G_loc_dn.out', 'r') as f:
@@ -439,14 +439,14 @@ class PostProcess:
 			tg_dn= [float(line.split()[4])+float(line.split()[6])+float(line.split()[10]) for line in lines]
 
 			y_eg_dn =[1*count/3.14 for count in yg_dn]
-			y_t2g_dn =[1*count/3.14 for count in tg_dn] 
+			y_t2g_dn =[1*count/3.14 for count in tg_dn]
 
 			plt.figure(1)
-			plt.plot(x,y_eg,'r',label='$d-e_g$') 
+			plt.plot(x,y_eg,'r',label='$d-e_g$')
 			plt.plot(x,y_t2g,'b',label='$d-t_{2g}$')
-			plt.plot(x_dn,y_eg_dn,'r') 
-			plt.plot(x_dn,y_t2g_dn,'b')  
-			plt.title('DMFT PDOS')  
+			plt.plot(x_dn,y_eg_dn,'r')
+			plt.plot(x_dn,y_t2g_dn,'b')
+			plt.title('DMFT PDOS')
 			plt.xlabel('Energy (eV)')
 			plt.ylabel('DOS (states eV/cell)')
 			plt.axvline(x=0,color='gray',linestyle='--')
@@ -457,12 +457,12 @@ class PostProcess:
 			plt.show()
 			if args.show:
 				plt.show()
-			f.close()	
-			
+			f.close()
+
 
 	def bands(self,args):
 		"""
-		This method performs the band structure calculations.			
+		This method performs the band structure calculations.
 		"""
 		dest_dir = 'bands'
 		dummy_broaden = 1
@@ -473,14 +473,14 @@ class PostProcess:
 		#creating directory for bands
 		if os.path.exists("bands"):
 			print('bands directory already exists.')
-		else:	
+		else:
 			os.makedirs("bands")
 
 		#copy Sig.out into /bands
 		if self.checksig():
 			shutil.copyfile('./ac/Sig.out','./bands/Sig1.out')
 		else:
-			sys.exit()	
+			sys.exit()
 
 		#interpolating
 		self.interpol(args.emin,args.emax,args.rom,dummy_broaden,dest_dir,sp)
@@ -562,7 +562,7 @@ class PostProcess:
 				filestr = './bands/'+SigMdc_files[filecounter]
 				savetxt(filestr,SigMdc[None],fmt='%.12f')
 
-# ################################################################################################################		
+# ################################################################################################################
 
 		print('kpband=',args.kpband)
 		print('kplist=',args.kplist)
@@ -574,14 +574,14 @@ class PostProcess:
 		for i in range(args.kpband):
 			kcheck=0
 			for j,d in enumerate(dist_SK):
-				if abs(dist_K[i]-d)<1e-10: 
+				if abs(dist_K[i]-d)<1e-10:
 					fi.write('%.14f  %.14f  %.14f  %.14f  %s \n' %(dist_K[i],klist[i][0],klist[i][1],klist[i][2],args.knames[j]))
 					kcheck=1
 					break
 			if kcheck==0:
-				fi.write('%.14f  %.14f  %.14f  %.14f \n' %(dist_K[i],klist[i][0],klist[i][1],klist[i][2])) 
+				fi.write('%.14f  %.14f  %.14f  %.14f \n' %(dist_K[i],klist[i][0],klist[i][1],klist[i][2]))
 		print('k-path generated.')
-		fi.close() 
+		fi.close()
 
 		#copying files from DMFT directory to dos directory
 		cmd = "cd bands && Copy_input.py ../ -post bands"
@@ -595,9 +595,9 @@ class PostProcess:
 
 
 		#generating ksum.input
-		self.genksum(args.rom,args.kpband)		
+		self.genksum(args.rom,args.kpband)
 
-		#running dmft_ksum_band 
+		#running dmft_ksum_band
 
 		if args.plotplain:
 			print("\nCalculating plain band structure...")
@@ -620,7 +620,7 @@ class PostProcess:
 				print('Band structure calculation failed!\n')
 				sys.exit()
 			else:
-				print('Band structure calculation complete.\n')	
+				print('Band structure calculation complete.\n')
 				self.plot_partial_bands(args)
 
 		if sp:
@@ -644,7 +644,7 @@ class PostProcess:
 
 		if args.vlim:
 			vmm = [args.vlim[0],args.vlim[1]]
-		else:	
+		else:
 			vmm = [0,10.0]
 		nk=0
 		SKP=[]
@@ -659,7 +659,7 @@ class PostProcess:
 			if len(line)==5:
 				SKP.append(float(line[0]))
 				SKPoints.append(line[4])
-		fi.close() 
+		fi.close()
 
 		fi=open('./bands/ksum.input','r')
 		numk=int(fi.readline())
@@ -674,8 +674,8 @@ class PostProcess:
 		fi=open('./bands/Gk.out','r')
 		for i in range(numk):
 			kpts.append(list(map(float,fi.readline().split()[1:])))
-			A_k.append([]) 
-			om.append([]) 
+			A_k.append([])
+			om.append([])
 			for j in range(nom):
 				line=list(map(float,fi.readline().split()))
 				A_k[i].append(-1*line[2]/3.14159265)
@@ -699,9 +699,9 @@ class PostProcess:
 		if args.show:
 			show()
 
-	def plot_partial_bands(self,args):	
+	def plot_partial_bands(self,args):
 		"""
-		This method plots partial bands for orbitals. The order of the orbitals is the Wannier orbital order. 
+		This method plots partial bands for orbitals. The order of the orbitals is the Wannier orbital order.
 		"""
 
 		print('Plotting projected band structure...')
@@ -709,7 +709,7 @@ class PostProcess:
 
 		if args.vlim:
 			vmm = [args.vlim[0],args.vlim[1]]
-		else:	
+		else:
 			vmm = [0,10.0]
 		SKP=[]
 		SKPoints=[]
@@ -723,7 +723,7 @@ class PostProcess:
 			if len(line)==5:
 				SKP.append(float(line[0]))
 				SKPoints.append(line[4])
-		fi.close() 
+		fi.close()
 
 		fi=open('./bands/ksum.input','r')
 		numk=int(fi.readline())
@@ -741,19 +741,19 @@ class PostProcess:
 		fi_gk.close()
 		filtered_orbs=[]
 
-		for i in range(numk):    
-			#kpts.append(list(map(float,data[i].split('\n')[0].split()[1:]))) 
+		for i in range(numk):
+			#kpts.append(list(map(float,data[i].split('\n')[0].split()[1:])))
 
 			for orbs in args.wanorbs:
 				filtered_orbs.append(data[i].split('\n')[1:][(orbs-1)*nom+orbs:orbs*nom+orbs])
 
 		for orb_counter in range(numk*len(args.wanorbs)):
-			for j in range(nom): 
+			for j in range(nom):
 				A_k.append(-1*float(filtered_orbs[orb_counter][j].split()[2])/3.14159265)
 				om.append(float(filtered_orbs[orb_counter][j].split()[0]))
 
 		A_k=np.array(A_k)
-		A_k=A_k.reshape(numk,nom*len(args.wanorbs))  
+		A_k=A_k.reshape(numk,nom*len(args.wanorbs))
 
 		A_kblend=np.zeros((len(args.wanorbs),numk,nom))
 		A_ktotal=np.zeros((numk,nom))
@@ -764,7 +764,7 @@ class PostProcess:
 			nom_counter=nom_counter+nom
 			A_ktotal=A_ktotal+A_kblend[orb,:,:]
 
-		A_ktotal = np.transpose(A_ktotal)[::-1]    
+		A_ktotal = np.transpose(A_ktotal)[::-1]
 
 		om=np.array(om)
 		om=om.reshape(numk,nom*len(args.wanorbs))
@@ -794,7 +794,7 @@ class PostProcess:
 
 		if args.vlim:
 			vmm = [args.vlim[0],args.vlim[1]]
-		else:	
+		else:
 			vmm = [0,10.0]
 		nk=0
 		SKP=[]
@@ -809,7 +809,7 @@ class PostProcess:
 			if len(line)==5:
 				SKP.append(float(line[0]))
 				SKPoints.append(line[4])
-		fi.close() 
+		fi.close()
 
 		# Spin up dataset
 		fi=open('./bands/ksum.input','r')
@@ -825,8 +825,8 @@ class PostProcess:
 		fi=open('./bands/Gk.out','r')
 		for i in range(numk):
 			kpts.append(list(map(float,fi.readline().split()[1:])))
-			A_k.append([]) 
-			om.append([]) 
+			A_k.append([])
+			om.append([])
 			for j in range(nom):
 				line=list(map(float,fi.readline().split()))
 				A_k[i].append(-1*line[2]/3.14159265)
@@ -843,8 +843,8 @@ class PostProcess:
 		fi=open('./bands/Gk_dn.out','r')
 		for i2 in range(numk):
 				kpts2.append(map(float,fi.readline().split()[1:]))
-				A_k2.append([]) 
-				om2.append([]) 
+				A_k2.append([])
+				om2.append([])
 				for j2 in range(nom):
 					line2=map(float,fi.readline().split())
 					A_k2[i2].append(-1*line2[2]/3.14159265)
@@ -916,14 +916,14 @@ if __name__ == "__main__":
 
 	#top level parser
 	print('\n----------------------------------------------- \n| Welcome to the DMFTwDFT post-processing tool |\n-----------------------------------------------\n')
-	des = 'This tool performs Analytic Contiunation, Density of States and Band structure calculations from DMFTwDFT outputs.' 
+	des = 'This tool performs Analytic Contiunation, Density of States and Band structure calculations from DMFTwDFT outputs.'
 	parser = argparse.ArgumentParser(description=des,formatter_class=RawTextHelpFormatter)
 	subparsers = parser.add_subparsers(help = 'sub-command help')
 
 	#parser for ac
 	parser_ac = subparsers.add_parser('ac',help = 'Analytic Continuation')
 	parser_ac.add_argument('-siglistindx',default=2, type=int, help='How many last self energy files to average?')
-	parser_ac.set_defaults(func=PostProcess().anal_cont)	
+	parser_ac.set_defaults(func=PostProcess().anal_cont)
 
 	#parser for dos
 	parser_dos = subparsers.add_parser('dos',help = 'DMFT Density of States')
@@ -936,7 +936,7 @@ if __name__ == "__main__":
 	parser_dos.add_argument('-elim',type=float, nargs=2,help='Energy range to plot')
 	parser_dos.set_defaults(func=PostProcess().dos)
 
-	#parser for bands 
+	#parser for bands
 	parser_bands = subparsers.add_parser('bands',help = 'DMFT Bandstructure')
 	parser_bands.add_argument('-emin',default=-5.0, type=float, help='Minimum value for interpolation')
 	parser_bands.add_argument('-emax',default=5.0, type=float, help='Maximum value for interpolation')

@@ -22,13 +22,13 @@ def CreateINCAR(params_vasp):
    f = open('INCAR', 'w')
    for p in params_vasp:
        print >> f, p, '  ', params_vasp[p][0], '\t', params_vasp[p][1]
-   f.close()   
+   f.close()
 
 
 
 if __name__ == '__main__':
    #top level parser
-   des = 'This script performs the  DMFT calculation.' 
+   des = 'This script performs the  DMFT calculation.'
    parser = argparse.ArgumentParser(description=des,formatter_class=RawTextHelpFormatter)
    parser.add_argument('-structurename', type=str, help='Name of the structure. Not required for VASP. ' )
    parser.add_argument('-dft',default='vasp', type=str, help='Choice of DFT code for the DMFT calculation.', choices=['vasp','siesta'])
@@ -36,7 +36,7 @@ if __name__ == '__main__':
    args = parser.parse_args()
 
 
-   
+
    execfile('INPUT.py') # Read input file
 
    main_out=open('INFO_TIME','w')
@@ -91,7 +91,7 @@ if __name__ == '__main__':
    DFT_iter.write('\n')
    DFT_iter.flush()
 
-   CHGDIFF=0.0 
+   CHGDIFF=0.0
    #### Read POSCAR ########
    TB=Struct.TBstructure('POSCAR',p['atomnames'],p['orbs'])
    cor_at=p['cor_at']; cor_orb=p['cor_orb']
@@ -152,10 +152,10 @@ if __name__ == '__main__':
          main_out.write( '--- Starting DMFT loop '+str(it+1)+now()+'---' )
          main_out.write('\n')
          main_out.flush()
-         
+
          if itt==0 and it==0:
             for i,ats in enumerate(cor_at):
-               if p['nspin']==2: pD['para=']=0 
+               if p['nspin']==2: pD['para=']=0
                else: pD['para=']=1
                if p['orbs'][0]=='f': pD['l=']=3
                elif p['orbs'][0]=='d': pD['l=']=2
@@ -171,7 +171,7 @@ if __name__ == '__main__':
                print out #, err
                cmd = 'cp UC.dat UC'+str(i+1)+'.dat'
                print os.popen(cmd).read()
-   
+
          if it==0:
             DMFT.EKIN0=0
             cmd = para_com+" "+p['path_bin']+"XHF0.py > ksum_output 2> ksum_error"
@@ -184,7 +184,7 @@ if __name__ == '__main__':
          if TB.LHF=='.FALSE.':
             cmd = para_com+" "+p['path_bin']+"dmft.x > ksum_output 2> ksum_error"
             out, err = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-         else: 
+         else:
             cmd = para_com+" "+p['path_bin']+"XHF.py > ksum_output 2> ksum_error"
             out, err = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
          print out #, err
@@ -195,8 +195,8 @@ if __name__ == '__main__':
 
          DMFT.Update_Sigoo_and_Vdc(TB,'sig.inp',p['nspin'])
          DMFT.Update_Nlatt(TB,p['nspin'])
-   
-   
+
+
          main_out.write( '--- DMFT Ksum is finished '+now()+'---' )
          main_out.write('\n')
          main_out.flush()
@@ -227,7 +227,7 @@ if __name__ == '__main__':
          DMFT.Compute_Sigoo_and_Vdc(p,TB)
          DMFT.Mix_Sig_and_Print_sig_inp(TB,p['Nd_qmc'],p['mix_sig'],'sig.inp',p['nspin'])
          shutil.copy2('sig.inp','sig.inp.'+str(itt+1)+'.'+str(it+1))
-         shutil.copy2('G_loc.out','G_loc.out.'+str(itt+1)+'.'+str(it+1)) 
+         shutil.copy2('G_loc.out','G_loc.out.'+str(itt+1)+'.'+str(it+1))
 
 
          DMFT.ETOT=DFT.E-DMFT.EKIN0+DMFT.EKIN+DMFT.EPOT-DMFT.Edc
@@ -240,12 +240,12 @@ if __name__ == '__main__':
          E_iter.write( '%14.6f %14.6f %14.6f %14.6f' %(DFT.E, DMFT.EKIN-DMFT.EKIN0, DMFT.EPOT-DMFT.Edc, DMFT.EPOT2-DMFT.Edc_imp) )
          E_iter.write('\n')
          E_iter.flush()
- 
+
       if itt<p['Niter']-1:
          main_out.write( '--- Running vaspCHG '+now()+'---' )
          main_out.write('\n')
          main_out.flush()
-   
+
          if itt==0:
             f = open('INCAR', 'a')
             print >> f, "NELM= "+str(p['Ndft'])
@@ -265,7 +265,8 @@ if __name__ == '__main__':
          main_out.write( '-------------- Running wannier 90 '+str(itt+1)+'----------------' )
          main_out.write('\n')
          main_out.flush()
-         cmd = para_com+" "+p['path_bin']+"wannier90.x wannier90"
+         #cmd = para_com+" "+p['path_bin']+"wannier90.x wannier90"
+         cmd = p['path_bin']+"wannier90.x wannier90"
          out, err = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
          print out #, err
 
