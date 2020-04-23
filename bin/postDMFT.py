@@ -25,6 +25,7 @@ import oreo
 import Re_wt
 import Struct
 from INPUT import *
+from splash import welcome
 
 
 class PostProcess:
@@ -1047,7 +1048,7 @@ if __name__ == "__main__":
     #    "\n----------------------------------------------- \n| Welcome to the DMFTwDFT post-processing tool |\n-----------------------------------------------\n"
     # )
     welcome()
-    des = "This tool performs Analytic Contiunation, Density of States and Band structure calculations from DMFTwDFT outputs."
+    des = "This script performs Analytic Contiunation, Density of States and Band structure calculations from DMFTwDFT outputs."
     parser = argparse.ArgumentParser(
         description=des, formatter_class=RawTextHelpFormatter
     )

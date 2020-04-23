@@ -7,7 +7,7 @@ date = "April 23, 2020"
 def welcome():
     print(pyfiglet.figlet_format("DMFTwDFT"))
     print(
-        "An open-source code combining Dynamical Mean Field Theory with various Density Functional Theory packages.\n"
+        "- An open-source code combining Dynamical Mean Field Theory with various Density Functional Theory packages.\n"
     )
     print("Version %s created on %s\n" % (version, date))
     print(

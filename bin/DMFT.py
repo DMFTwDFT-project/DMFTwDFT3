@@ -15,7 +15,7 @@ import Struct
 import VASP3
 from INPUT import *
 
-from .splash import welcome
+from splash import welcome
 
 
 class Initialize:
