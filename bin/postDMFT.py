@@ -49,11 +49,8 @@ class PostProcess:
 
     def __init__(self):
         """
-		Initializes the following:
-		"""
-        print("-------------------------------------------------------")
-        print("Starting post-processing...\n")
-
+        Initializes the following:
+        """
         # mpirun
         if os.path.exists("para_com.dat"):
             fipa = open("para_com.dat", "r")
