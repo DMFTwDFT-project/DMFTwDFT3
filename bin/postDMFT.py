@@ -550,7 +550,7 @@ class PostProcess:
         ############################# Generate sequence list ##################################
         sort_atm = sorted([atm for atms in cor_at for atm in atms])
         atm_sqn = self.Make_coor_list(sort_atm, cor_at)
-        print(("atm_sqn:", atm_sqn))
+        print("atm_sqn:", atm_sqn)
         orb_sqn = []
         for i in atm_sqn:
             len_sf = 0
@@ -559,7 +559,7 @@ class PostProcess:
             orb_idx = self.Make_coor_list(TB.TB_orbs[cor_at[i][0]], cor_orb[i])
             for idx in orb_idx:
                 orb_sqn.append(idx + len_sf)
-        print(("orb_sqn:", orb_sqn))
+        print("orb_sqn:", orb_sqn)
         ################################# Read sig.inp_real ####################################
 
         # non spin-polarized calculation
@@ -622,9 +622,9 @@ class PostProcess:
 
         # ################################################################################################################
 
-        print(("kpband=", args.kpband))
-        print(("kplist=", args.kplist))
-        print(("knames=", args.knames))
+        print("kpband=", args.kpband)
+        print("kplist=", args.kplist)
+        print("knames=", args.knames)
 
         # generating k-path
         klist, dist_K, dist_SK = self.Create_kpath(args.kplist, args.kpband)
@@ -738,9 +738,9 @@ class PostProcess:
 
         fi = open("./bands/ksum.input", "r")
         numk = int(fi.readline())
-        print(("numk=", numk))
+        print("numk=", numk)
         nom = int(fi.readline())
-        print(("nom=", nom))
+        print("nom=", nom)
         fi.close()
         A_k = []
         dist_k = []
@@ -789,7 +789,7 @@ class PostProcess:
 		"""
 
         print("Plotting projected band structure...")
-        print(("Wannier orbitals list:", args.wanorbs))
+        print("Wannier orbitals list:", args.wanorbs)
 
         if args.vlim:
             vmm = [args.vlim[0], args.vlim[1]]
@@ -811,9 +811,9 @@ class PostProcess:
 
         fi = open("./bands/ksum.input", "r")
         numk = int(fi.readline())
-        print(("numk=", numk))
+        print("numk=", numk)
         nom = int(fi.readline())
-        print(("nom=", nom))
+        print("nom=", nom)
         fi.close()
 
         A_k = []
@@ -910,9 +910,9 @@ class PostProcess:
         # Spin up dataset
         fi = open("./bands/ksum.input", "r")
         numk = int(fi.readline())
-        print(("numk=", numk))
+        print("numk=", numk)
         nom = int(fi.readline())
-        print(("nom=", nom))
+        print("nom=", nom)
         fi.close()
         A_k = []
         dist_k = []
