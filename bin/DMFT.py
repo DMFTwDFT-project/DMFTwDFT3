@@ -67,6 +67,9 @@ class Initialize:
         else:
             self.para_com_dft = self.para_com
 
+        # initial chemical potential
+        self.create_DFTmu()
+
         # import the VASP class. This can be used for other DFT codes as well.
         self.DFT = VASP3.VASP_class()
 
@@ -82,8 +85,6 @@ class Initialize:
         # force dmft calculation True of False
         self.force = args.force
 
-        # initial chemical potential
-        create_DFTmu()
 
         ###################### VASP  ###################################################
         if args.dft == "vasp":
@@ -124,10 +125,12 @@ class Initialize:
         guess for the chemical potential. It will be updated once
         the DFT calculation is finished.
         """
+        mu = 7.0
+
         if os.path.exists("DFT_mu.out"):
             os.remove("DFT_mu.out")
-        f = open("DFT_mu.out", w)
-        f.write("%f" % 7.0)
+        f = open("DFT_mu.out", "w")
+        f.write("%f" % mu)
         f.close()
 
     def fdf_to_poscar(self):
