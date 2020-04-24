@@ -16,5 +16,5 @@ def welcome():
     print(
         "DMFTwDFT: An open-source code combining Dynamical Mean Field Theory with various Density Functional Theory packages,."
     )
-    print("arXiv:2002.00068 [cond-mat.str-el].")
+    print("arXiv:2002.00068 [cond-mat.str-el].\n")
     return
