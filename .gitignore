@@ -1,11 +1,13 @@
 *.pyc
 .DS_Store
 examples/run_examples/
+ctqmc
 *.so
 skrams
 vaspDMFT
 libdmft.a
 *.o
+*.x
 
 #sphinx
 _build/
