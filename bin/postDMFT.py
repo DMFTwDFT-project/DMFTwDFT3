@@ -511,7 +511,6 @@ class PostProcess:
             plt.xlim(min(min(x), min(x_dn)), max(max(x), max(x_dn)))
             plt.legend()
             plt.savefig("./dos/DMFT-PDOS_sp.png")
-            plt.show()
             if args.show:
                 plt.show()
             f.close()
