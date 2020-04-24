@@ -58,7 +58,7 @@ class Initialize:
             self.para_com = str(fipa.readline())[:-1]
             fipa.close()
         else:
-            self.para_com = ""
+            self.para_com = "mpirun -np 40"
 
         if os.path.exists("para_com_dft.dat"):
             fid = open("para_com_dft.dat")
@@ -81,6 +81,9 @@ class Initialize:
 
         # force dmft calculation True of False
         self.force = args.force
+
+        # initial chemical potential
+        create_DFTmu()
 
         ###################### VASP  ###################################################
         if args.dft == "vasp":
@@ -114,6 +117,18 @@ class Initialize:
             self.type = "HF"
 
         self.run_dmft()
+
+    def create_DFTmu(self):
+        """
+        This function creates a DFT_mu.out with an initial
+        guess for the chemical potential. It will be updated once
+        the DFT calculation is finished.
+        """
+        if os.path.exists("DFT_mu.out"):
+            os.remove("DFT_mu.out")
+        f = open("DFT_mu.out", w)
+        f.write("%f" % 7.0)
+        f.close()
 
     def fdf_to_poscar(self):
         """
