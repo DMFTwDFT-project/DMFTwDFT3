@@ -14,7 +14,6 @@ import numpy as np
 import Struct
 import VASP3
 from INPUT import *
-
 from splash import welcome
 
 
@@ -51,6 +50,9 @@ class Initialize:
 		Contains common functions for all methods.
 		This launches the dmft calculation as well.
 		"""
+        print("-------------------------------------------------------")
+        print("Starting calculation...\n")
+
         if os.path.exists("para_com.dat"):
             fipa = open("para_com.dat", "r")
             self.para_com = str(fipa.readline())[:-1]
@@ -414,7 +416,7 @@ class Initialize:
             print(err.decode("utf-8"))
             sys.exit()
         else:
-            print("Initial self-energy file generated.\n")
+            print("\nInitial self-energy file generated.\n")
 
     def copy_files(self):
         """

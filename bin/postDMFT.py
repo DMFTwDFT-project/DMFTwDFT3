@@ -51,6 +51,8 @@ class PostProcess:
         """
 		Initializes the following:
 		"""
+        print("-------------------------------------------------------")
+        print("Starting post-processing...\n")
 
         # mpirun
         if os.path.exists("para_com.dat"):
