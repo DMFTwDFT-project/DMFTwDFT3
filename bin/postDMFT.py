@@ -96,18 +96,18 @@ class PostProcess:
             # exec(ar[0])
             # m=re.search('#(.*)',line)
             # exec(m.group(1).strip())
-        # s_oo_Vdc=array(s_oo)-array(Vdc)
+        # s_oo_Vdc=np.array(s_oo)-array(Vdc)
         fi.close()
         s_oo_Vdc = np.array((np.array(s_oo)).astype(np.float)) - np.array(
             (np.array(Vdc)).astype(np.float)
         )
 
-        ommesh = linspace(emin, emax, rom)
+        ommesh = np.linspace(emin, emax, rom)
 
         # non spin polarized case
         if sp == False:
 
-            Sig_tot = zeros((len(Sig), rom), dtype=complex)
+            Sig_tot = np.zeros((len(Sig), rom), dtype=complex)
 
             for i in range(len(Sig)):
                 SigSpline = interpolate.splrep(om, Sig[i].real, k=1, s=0)
@@ -143,8 +143,8 @@ class PostProcess:
         # Spin polarized calculation
         if sp:
 
-            Sig_tot = zeros((int(len(Sig) / 2), rom), dtype=complex)
-            Sig_tot_dn = zeros((int(len(Sig) / 2), rom), dtype=complex)
+            Sig_tot = np.zeros((int(len(Sig) / 2), rom), dtype=complex)
+            Sig_tot_dn = np.zeros((int(len(Sig) / 2), rom), dtype=complex)
 
             for i in range(int(len(Sig) / 2)):
                 # spin
@@ -266,14 +266,14 @@ class PostProcess:
         print("\nGenerating k-path...")
 
         def dist(a, b):
-            return sqrt(sum((array(a) - array(b)) ** 2))
+            return np.lib.scimath.sqrt(np.sum((np.array(a) - np.array(b)) ** 2))
 
         # returns the distance of given a and b points
-        KPoints = array(KPoints)
+        KPoints = np.array(KPoints)
         path_len = []
         for i in range(len(KPoints) - 1):
             path_len.append(dist(KPoints[i + 1], KPoints[i]))
-        path_nk = list(map(int, nk_band * array(path_len) / sum(path_len)))
+        path_nk = list(map(int, nk_band * np.array(path_len) / np.sum(path_len)))
         klist = []
         dist_K = [0.0]
         dist_SK = [0.0]
@@ -287,7 +287,7 @@ class PostProcess:
         # Add the ending point
         klist.append(KPoints[-1])
         dist_K.append(dist_K[-1] + dist(klist[-1], klist[-2]))
-        return array(klist), array(dist_K), array(dist_SK)
+        return np.array(klist), np.array(dist_K), np.array(dist_SK)
 
     def genksum(self, rom, kpband):
         fp = open("./bands/ksum.input", "w")
@@ -571,19 +571,19 @@ class PostProcess:
             sigmdc_tmp = [float(ele) for ele in fi.readline().split()[-1 * ncor_orb :]]
             sigoo = fi.readline().split()
             vdc = fi.readline().split()
-            sig_real = array([ele.split() for ele in fi.readlines()])
+            sig_real = np.array([ele.split() for ele in fi.readlines()])
             fi.close()
-            assert shape(sig_real)[0] == nom
+            assert np.shape(sig_real)[0] == nom
             ###################### Write SigMoo ##################
-            SigMoo = zeros((nom, len(orb_sqn) * 2 + 1), dtype=float)
-            SigMoo[:, 0] = array(sig_real[:, 0])
+            SigMoo = np.zeros((nom, len(orb_sqn) * 2 + 1), dtype=float)
+            SigMoo[:, 0] = np.array(sig_real[:, 0])
             for i in range(len(orb_sqn)):
-                SigMoo[:, i * 2 + 1] = array(sig_real[:, orb_sqn[i] * 2 + 1])
-                SigMoo[:, i * 2 + 2] = array(sig_real[:, orb_sqn[i] * 2 + 2])
-            savetxt("./bands/SigMoo_real.out", SigMoo, fmt="%.10f")
+                SigMoo[:, i * 2 + 1] = np.array(sig_real[:, orb_sqn[i] * 2 + 1])
+                SigMoo[:, i * 2 + 2] = np.array(sig_real[:, orb_sqn[i] * 2 + 2])
+            np.savetxt("./bands/SigMoo_real.out", SigMoo, fmt="%.10f")
             ############################ Srite SigMdc.out ########################
-            SigMdc = array([sigmdc_tmp[i] for i in orb_sqn])
-            savetxt("./bands/SigMdc.out", SigMdc[None], fmt="%.12f")
+            SigMdc = np.array([sigmdc_tmp[i] for i in orb_sqn])
+            np.savetxt("./bands/SigMdc.out", SigMdc[None], fmt="%.12f")
 
         # spin polarized calculation
         if sp:
@@ -602,23 +602,23 @@ class PostProcess:
                 ]
                 sigoo = fi.readline().split()
                 vdc = fi.readline().split()
-                sig_real = array([ele.split() for ele in fi.readlines()])
+                sig_real = np.array([ele.split() for ele in fi.readlines()])
                 fi.close()
-                assert shape(sig_real)[0] == nom
+                assert np.shape(sig_real)[0] == nom
                 ###################### Write SigMoo ##################
-                SigMoo = zeros((nom, len(orb_sqn) * 2 + 1), dtype=float)
-                SigMoo[:, 0] = array(sig_real[:, 0])
+                SigMoo = np.zeros((nom, len(orb_sqn) * 2 + 1), dtype=float)
+                SigMoo[:, 0] = np.array(sig_real[:, 0])
                 for i in range(len(orb_sqn)):
-                    SigMoo[:, i * 2 + 1] = array(sig_real[:, orb_sqn[i] * 2 + 1])
-                    SigMoo[:, i * 2 + 2] = array(sig_real[:, orb_sqn[i] * 2 + 2])
+                    SigMoo[:, i * 2 + 1] = np.array(sig_real[:, orb_sqn[i] * 2 + 1])
+                    SigMoo[:, i * 2 + 2] = np.array(sig_real[:, orb_sqn[i] * 2 + 2])
                 filestr = "./bands/" + SigMooreal_files[filecounter]
-                savetxt(filestr, SigMoo, fmt="%.10f")
+                np.savetxt(filestr, SigMoo, fmt="%.10f")
                 ############################ Write SigMdc.out ########################
-                SigMdc = array([sigmdc_tmp[i] for i in orb_sqn])
+                SigMdc = np.array([sigmdc_tmp[i] for i in orb_sqn])
                 print(sigmdc_tmp)
                 print(SigMdc)
                 filestr = "./bands/" + SigMdc_files[filecounter]
-                savetxt(filestr, SigMdc[None], fmt="%.12f")
+                np.savetxt(filestr, SigMdc[None], fmt="%.12f")
 
         # ################################################################################################################
 
@@ -772,7 +772,7 @@ class PostProcess:
             aspect="auto",
         )
         colorbar(
-            im, orientation="vertical", pad=0.05, shrink=1.0, ticks=arange(0, 10.0, 1.0)
+            im, orientation="vertical", pad=0.05, shrink=1.0, ticks=np.arange(0, 10.0, 1.0)
         )
         xticks(SKP, SKPoints)
         xlabel("k-path", fontsize="xx-large")
@@ -870,7 +870,7 @@ class PostProcess:
         )
 
         colorbar(
-            im, orientation="vertical", pad=0.05, shrink=1.0, ticks=arange(0, 10.0, 1.0)
+            im, orientation="vertical", pad=0.05, shrink=1.0, ticks=np.arange(0, 10.0, 1.0)
         )
         xticks(SKP, SKPoints)
         xlabel("k-path", fontsize="xx-large")
@@ -989,7 +989,7 @@ class PostProcess:
         axhline(y=0, color="black", ls="--")
 
         # ax1=subplot(111)
-        # for i in range(18,shape(eigval0)[1]):
+        # for i in range(18,np.shape(eigval0)[1]):
         #   ax1.plot(k_eig,eigval0[:,i]-7.22220722842 ,color='green')
         ##ax1.plot([k_eig[319],k_eig[319]], [ymin,ymax], 'w-')
         # xticks([0,1,2],['$\Gamma$','X','M'])
@@ -1006,7 +1006,7 @@ class PostProcess:
             orientation="vertical",
             pad=0.05,
             shrink=1.0,
-            ticks=arange(0, 10.0, 1.0),
+            ticks=np.arange(0, 10.0, 1.0),
             cax=cbar_ax,
         )
 
