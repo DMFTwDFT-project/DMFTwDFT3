@@ -11,9 +11,7 @@ def welcome():
     )
     print("Version %s created on %s\n" % (version, date))
     print(
-        "Please cite: Vijay Singh, Uthpala Herath, Benny Wah, Xingyu Liao, Aldo H. Romero, Hyowon Park,. \
-        DMFTwDFT: An open-source code combining Dynamical Mean Field Theory with various Density Functional Theory packages,. \
-        arXiv:2002.00068 [cond-mat.str-el].\n"
+        "Please cite: Vijay Singh, Uthpala Herath, Benny Wah, Xingyu Liao, Aldo H. Romero, Hyowon Park,. DMFTwDFT: An open-source code combining Dynamical Mean Field Theory with various Density Functional Theory packages,. arXiv:2002.00068 [cond-mat.str-el].\n"
     )
 
     print("-------------------------------------------------------")
