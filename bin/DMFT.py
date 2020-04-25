@@ -50,8 +50,6 @@ class Initialize:
 		Contains common functions for all methods.
 		This launches the dmft calculation as well.
 		"""
-        print("-------------------------------------------------------")
-        print("Starting calculation...\n")
 
         if os.path.exists("para_com.dat"):
             fipa = open("para_com.dat", "r")
@@ -84,7 +82,6 @@ class Initialize:
 
         # force dmft calculation True of False
         self.force = args.force
-
 
         ###################### VASP  ###################################################
         if args.dft == "vasp":
