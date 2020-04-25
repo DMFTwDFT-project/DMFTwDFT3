@@ -772,7 +772,11 @@ class PostProcess:
             aspect="auto",
         )
         colorbar(
-            im, orientation="vertical", pad=0.05, shrink=1.0, ticks=np.arange(0, 10.0, 1.0)
+            im,
+            orientation="vertical",
+            pad=0.05,
+            shrink=1.0,
+            ticks=np.arange(0, 10.0, 1.0),
         )
         xticks(SKP, SKPoints)
         xlabel("k-path", fontsize="xx-large")
@@ -870,7 +874,11 @@ class PostProcess:
         )
 
         colorbar(
-            im, orientation="vertical", pad=0.05, shrink=1.0, ticks=np.arange(0, 10.0, 1.0)
+            im,
+            orientation="vertical",
+            pad=0.05,
+            shrink=1.0,
+            ticks=np.arange(0, 10.0, 1.0),
         )
         xticks(SKP, SKPoints)
         xlabel("k-path", fontsize="xx-large")
