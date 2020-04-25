@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python2
 import argparse
 import copy
 import glob
@@ -550,7 +550,7 @@ class PostProcess:
         ############################# Generate sequence list ##################################
         sort_atm = sorted([atm for atms in cor_at for atm in atms])
         atm_sqn = self.Make_coor_list(sort_atm, cor_at)
-        print("atm_sqn:", atm_sqn)
+        print("atm_sqn:%s" % atm_sqn)
         orb_sqn = []
         for i in atm_sqn:
             len_sf = 0
@@ -559,7 +559,7 @@ class PostProcess:
             orb_idx = self.Make_coor_list(TB.TB_orbs[cor_at[i][0]], cor_orb[i])
             for idx in orb_idx:
                 orb_sqn.append(idx + len_sf)
-        print("orb_sqn:", orb_sqn)
+        print("orb_sqn:%s" % orb_sqn)
         ################################# Read sig.inp_real ####################################
 
         # non spin-polarized calculation
@@ -622,9 +622,9 @@ class PostProcess:
 
         # ################################################################################################################
 
-        print("kpband=", args.kpband)
-        print("kplist=", args.kplist)
-        print("knames=", args.knames)
+        print("kpband=%s" % args.kpband)
+        print("kplist=%s" % args.kplist)
+        print("knames=%s" % args.knames)
 
         # generating k-path
         klist, dist_K, dist_SK = self.Create_kpath(args.kplist, args.kpband)
@@ -738,9 +738,9 @@ class PostProcess:
 
         fi = open("./bands/ksum.input", "r")
         numk = int(fi.readline())
-        print("numk=", numk)
+        print("numk=%s" % numk)
         nom = int(fi.readline())
-        print("nom=", nom)
+        print("nom=%s" % nom)
         fi.close()
         A_k = []
         dist_k = []
@@ -811,9 +811,9 @@ class PostProcess:
 
         fi = open("./bands/ksum.input", "r")
         numk = int(fi.readline())
-        print("numk=", numk)
+        print("numk=%s" % numk)
         nom = int(fi.readline())
-        print("nom=", nom)
+        print("nom=%s" % nom)
         fi.close()
 
         A_k = []
@@ -910,9 +910,9 @@ class PostProcess:
         # Spin up dataset
         fi = open("./bands/ksum.input", "r")
         numk = int(fi.readline())
-        print("numk=", numk)
+        print("numk=%s" % numk)
         nom = int(fi.readline())
-        print("nom=", nom)
+        print("nom=%s" % nom)
         fi.close()
         A_k = []
         dist_k = []
