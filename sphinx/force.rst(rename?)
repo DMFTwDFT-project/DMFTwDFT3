@@ -7,7 +7,7 @@ This is a draft tutorial on how to run force calculations. [VASP version]
 3. Run the script oreo.py. This will strip and put into format the \delta\epsilon for each band,onto each k-pt.
    The resulting deltEps_(#).deig files are the same order per ion, per cartesian coordinate (VASP)
 
-4. Run the script co_eff.py. The eigenmodes are calculated already in DFT packages with respective cartesian coefficients
+4. Run the script co_eff_phon.py. The eigenmodes are calculated already in DFT packages with respective cartesian coefficients
    of each displacement. This script will return Ramode_(#).deig files which have the reconstructed changes in \delta \epsilon
    values attributed to the Raman/eigen-mode. The # is the same order as the eigenmode listed in DFT output (VASP)
    
