@@ -1,0 +1,18 @@
+This is a draft tutorial on how to run force calculations. [VASP version]
+
+1. Do your standard DFT calculation with symmetry turned off (this is to preserve the cardinality of the k-pt list)
+
+2. Once well-converged, run your DFPT calculation
+
+3. Run the script oreo.py. This will strip and put into format the \delta\epsilon for each band,onto each k-pt.
+   The resulting deltEps_(#).deig files are the same order per ion, per cartesian coordinate (VASP)
+
+4. Run the script co_eff.py. The eigenmodes are calculated already in DFT packages with respective cartesian coefficients
+   of each displacement. This script will return Ramode_(#).deig files which have the reconstructed changes in \delta \epsilon
+   values attributed to the Raman/eigen-mode. The # is the same order as the eigenmode listed in DFT output (VASP)
+   
+   note to self: combine oreo.py and co_eff.py and clean up the intermediate files. Also, check to make sure the coefficients direct
+   and not cartesian please.
+   
+5. Move the desired Ramode_(#).deig file to your anticipated DMFT work directory as wannier90.deig [to be changed?] and run
+   the packaged DMFT routine. The right-most column in INFO_KSUM, listed as d_eps(?), should now output the force.
