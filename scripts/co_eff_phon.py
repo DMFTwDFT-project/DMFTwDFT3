@@ -27,14 +27,29 @@ if __name__=='__main__':
                   Dells.write("%d       %d      %.6f    \n" %(bandno,kpt,celta))
                kpt=kpt+1
 
-   
+
    trigger='THz'
    trig1='dx'
    num_at= int(input('how many atoms do you have?'))
    flag= 0
-   begin=10**10
+   strang=''
+   strangat=''
 
-#   holder=None
+   for i in range(num_at):
+      strang+=str(i+1)+','
+   strang=strang[:-1]
+
+#   strangtxt=open("strangalang",'w')
+#   n=strangtxt.write(strang)
+#   strangtxt.close()
+   for i in range(num_at):
+      strangat+='$'+str(3*(i+1))+'+'
+   strangat=strangat[:-1]
+
+#   strangattxt=open("strangatalang",'w')
+#   n=strangattxt.write(strangat)
+#   strangattxt.close()
+#   print(strangat)
 
    if os.path.exists('OUTCAR') and os.path.exists('DYNMAT'):
       lines=open('OUTCAR','r').readlines()[1:]
@@ -58,8 +73,9 @@ if __name__=='__main__':
                print os.popen(cmd).read()
                idof+=3
                count+=1
-            cmd='paste Ramode_'+str(flag)+'_{1,2,3,4,5}.deig | awk \'{print $1,$2,$3+$6+$9+$12+$15}\'>Ramode_'+str(flag)+'.deig'
+            cmd='paste Ramode_'+str(flag)+'_{'+strang+'}.deig | awk \'{print $1,$2,'+strangat+'}\'>Ramode_'+str(flag)+'.deig'
             print os.popen(cmd).read()
+
       cmd='rm Ramode_*_*.deig | rm deltEps_*.deig'
       print os.popen(cmd).read()
-
+                                                                                                                                                                                      81,0-1        Bo
