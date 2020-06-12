@@ -14,7 +14,13 @@ module read_inputs
   complex(kind=dp), allocatable, save :: HamR(:,:,:)
   complex(kind=dp), allocatable, save :: dHamR(:,:,:)
   complex(kind=dp), allocatable, save :: UMatrix(:,:,:)
+  complex(kind=dp), allocatable, save :: dUMatrix(:,:,:)
+  complex(kind=dp), allocatable, save :: ck(:,:,:)
+  complex(kind=dp), allocatable, save :: cw(:,:,:)
+  complex(kind=dp), allocatable, save :: ck1(:,:,:)
+  complex(kind=dp), allocatable, save :: cw1(:,:,:)
   complex(kind=dp), allocatable, save :: amn_mat(:,:,:)
+  complex(kind=dp), allocatable, save :: damn_mat(:,:,:)
   complex(kind=dp), allocatable, save :: Sigma(:,:)
   real(kind=dp), allocatable, save :: Sigoo(:)
   real(kind=dp), allocatable, save :: om(:)
@@ -165,8 +171,14 @@ contains
       if (ierr /= 0) call io_error('Error allocating UMatrix in Read_wan_chk')
     endif
     UMatrix=cmplx_0
+    if (.not. allocated(dUMatrix)) then
+      allocate (dUMatrix(num_bands,num_bands,num_kpts), stat=ierr)
+      if (ierr /= 0) call io_error('disgusting... use check')
+    endif
+    dUMatrix=cmplx_0
     DO nkp=1,num_kpts
       UMatrix(:,:,nkp)=MATMUL(u_matrix_opt(:,:,nkp),u_matrix(:,:,nkp))
+      dUMatrix(:,:,nkp)=0
     ENDDO
     !write(*,*) band_win 
     !write(*,*) UMatrix(:,1,1)
@@ -246,6 +258,74 @@ contains
     deallocate(UNI_mat)
 
   end subroutine Compute_UNI_from_amn    
+
+  subroutine Compute_dUNI_from_damn()
+    use constants, only: dp, cmplx_0
+    use io, only: io_error, io_file_unit, stdout, seedname
+    use utility
+
+    implicit none
+
+    character(len=1) :: header
+    logical :: iffile
+    integer :: nkp,nbmin,nbmax,num_band_max,ierr,N,M,L
+    complex(kind=dp), allocatable :: UNI_mat(:,:,:),dUNI_loc(:,:)
+    real(kind=dp), allocatable :: evalue(:)
+
+    if (.not. allocated(UNI_mat)) then
+      allocate (UNI_mat(num_wann,num_wann,num_kpts), stat=ierr)
+      if (ierr /= 0) call io_error('Error allocating UNI_mat in Print_overlap')
+    endif
+    UNI_mat=cmplx_0
+    inquire(file='UNI_mat.dat',exist=iffile)
+    if (iffile.eqv. .false.)then
+       write(*,*) 'UNI_mat.dat must be present!!'
+       STOP
+    else
+       open(unit=30,file='UNI_mat.dat',status='old',form='formatted')
+       do L=1,num_kpts
+         read(30,*) header
+         do N=1,num_wann
+           do M=1,num_wann
+             read(30,*) UNI_mat(N,M,L)
+           enddo
+         enddo
+       enddo
+       close(30)
+    endif
+
+
+    allocate(ck1(num_band_max,num_band_max,num_kpts))
+    allocate(cw1(num_wann,num_wann,num_kpts))
+    cw1=cmplx_0
+    ck1=cmplx_0
+    !UMatrix=cmplx_0
+    DO nkp=1,num_kpts
+      nbmin=band_win(1,nkp); nbmax=band_win(2,nkp)
+      num_band_max=nbmax-nbmin+1
+      if (.not. allocated(dUNI_loc)) then
+        allocate (dUNI_loc(num_band_max,num_wann), stat=ierr)
+        if (ierr /= 0) call io_error('Error allocating Overlap in Print_overlap')
+      endif
+      allocate(evalue(num_wann))
+
+      call SVD(damn_mat(nbmin:nbmax,:,nkp),num_band_max,num_wann,evalue,ck1(:,:,nkp),cw1(:,:,nkp))
+      !UNI_loc=0.0_dp
+
+      dUNI_loc=cmplx_0
+      do N=1,num_band_max
+        do M=1,num_wann
+          do L=1,num_wann
+             dUNI_loc(N,M) = dUNI_loc(N,M) + ck1(N,L,nkp)*cw1(L,M,nkp)
+          enddo
+        enddo
+      enddo
+      dUMatrix(1:num_band_max,:,nkp)=MATMUL(dUNI_loc(:,:),UNI_mat(:,:,nkp))
+      deallocate(evalue,dUNI_loc)
+    ENDDO
+    deallocate(UNI_mat)
+
+  end subroutine Compute_dUNI_from_damn
 
   subroutine Check_Unitarity()
     use constants, only: dp, cmplx_0
@@ -395,6 +475,47 @@ contains
     endif
     !write(*,*) amn_mat(1,1,1)
   end subroutine Read_wan_amn
+  subroutine Read_wan_damn()
+    use constants, only: dp, cmplx_0
+    use io, only: io_error, io_file_unit, stdout, seedname
+
+    implicit none
+
+    ! local Wannier variables
+    character(len=1) :: header
+    logical :: iffile
+    integer :: i,j,k,idx1,idx2,idx3,ierr
+    real(kind=dp) :: A_re, A_im
+
+    if (.not. allocated(damn_mat)) then
+      allocate (damn_mat(num_tot_bands,num_wann,num_kpts), stat=ierr)
+      if (ierr /= 0) call io_error('Error allocating amn_mat in Read_wan_amn')
+    endif
+
+    damn_mat=cmplx_0
+    !write(*,*) num_kpts,num_wann,num_tot_bands
+
+    inquire(file='wannier90.damn',exist=iffile)
+    if (iffile.eqv. .false.)then
+       write(*,*) 'wannier90.damn must be present!!'
+       STOP
+    else
+       open(unit=30,file='wannier90.damn',status='old',form='formatted')
+       read(30,*) header
+       read(30,*) header
+       do i=1,num_kpts
+         do j=1,num_wann
+           do k=1,num_tot_bands
+             read(30,*) idx1,idx2,idx3,A_re,A_im
+             !write(*,*) A_re, A_im
+             damn_mat(k,j,i)=dcmplx(A_re,A_im)
+           enddo
+         enddo
+       enddo
+       close(30)
+    endif
+    !write(*,*) amn_mat(1,1,1)
+  end subroutine Read_wan_damn
 
 
   subroutine Read_wan_eig()
